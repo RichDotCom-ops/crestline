@@ -1,0 +1,111 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SafeSpend</title><meta name="theme-color" content="#0b1210">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="SafeSpend">
+<style>
+:root{--bg:#0b1210;--card:#131f1b;--card2:#192a24;--tx:#e8f5f0;--mu:#8aa89c;--ac:#34d399;--ac2:#22d3ee;--bad:#fb7185;--ln:#223630}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 0 0;min-height:100dvh;background:radial-gradient(120% 60% at 50% -10%,#14392e 0,transparent 60%),var(--bg)}
+main{max-width:520px;margin:0 auto;padding:18px 16px calc(96px + env(safe-area-inset-bottom))}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:15px;color:var(--mu);font-weight:600;margin:22px 0 8px;text-transform:uppercase;letter-spacing:.06em}
+.sub{color:var(--mu);margin:0 0 14px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:20px;padding:16px;margin-bottom:12px}
+.hero{text-align:center;padding:22px 16px;background:linear-gradient(160deg,#16352c,#12201c)}
+.ring{position:relative;width:210px;height:210px;margin:6px auto}
+.ring svg{transform:rotate(-90deg)}.ring .t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.big{font-size:42px;font-weight:800;letter-spacing:-.02em}.lbl{color:var(--mu);font-size:13px}
+.bad{color:var(--bad)}.ok{color:var(--ac)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid .card{margin:0;padding:14px}.grid b{display:block;font-size:20px;margin-top:2px}
+input,select{width:100%;background:var(--card2);border:1px solid var(--ln);color:var(--tx);border-radius:14px;padding:13px 14px;font:inherit;outline:none}
+input:focus{border-color:var(--ac)}label{display:block;font-size:13px;color:var(--mu);margin:10px 0 5px}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.row>.sm{flex:0 0 auto}
+button{font:inherit;border:0;border-radius:14px;padding:13px 16px;font-weight:700;color:#04140e;background:linear-gradient(135deg,var(--ac),var(--ac2));cursor:pointer}
+button.g{background:var(--card2);color:var(--tx);border:1px solid var(--ln)}button.x{background:none;color:var(--mu);padding:6px 10px}button.w{width:100%}
+.item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln)}.item:last-child{border:0}
+.item small{color:var(--mu);display:block}.bar{height:10px;background:var(--card2);border-radius:9px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:9px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-around;background:rgba(14,24,21,.92);backdrop-filter:blur(16px);border-top:1px solid var(--ln);padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+nav button{background:none;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;padding:6px 14px;border-radius:12px}
+nav button.on{color:var(--ac)}nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msg{font-size:13px;color:var(--mu);margin-top:8px}.empty{text-align:center;color:var(--mu);padding:14px}
+</style></head><body><main id="app"></main>
+<nav id="nav"></nav>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script>
+const $=s=>document.querySelector(s),KEY='safespend.v1',CFG=window.CONFIG||{};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
+const money2=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(n||0);
+const iso=d=>d.toLocaleDateString('en-CA'),sum=a=>a.reduce((x,y)=>x+ +y.a,0);
+const def=()=>({income:0,bills:[],goal:{name:'',amount:0,saved:0,date:''},spends:[],notif:{on:false,time:'09:00',last:''}});
+let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||'{}')),tab='today',sb=null,user=null,msg='',t0;
+if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
+function save(){localStorage.setItem(KEY,JSON.stringify(S));if(sb&&user){clearTimeout(t0);t0=setTimeout(()=>sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()}),600)}}
+function calc(){const now=new Date(),dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),left=dim-now.getDate()+1;
+const bills=sum(S.bills.map(b=>({a:b.amount}))),g=S.goal;let ms=0;
+if(+g.amount>+g.saved&&g.date){const days=(new Date(g.date+'T23:59')-now)/864e5;ms=(g.amount-g.saved)/Math.max(1,Math.ceil(days/30.44))}
+const disc=S.income-bills-ms,ym=iso(now).slice(0,7),td=iso(now);
+const spentM=sum(S.spends.filter(s=>s.d.startsWith(ym))),spentT=sum(S.spends.filter(s=>s.d===td));
+const safe=(disc-(spentM-spentT))/left;
+return{left,bills,ms,disc,spentM,spentT,safe,leftToday:safe-spentT,leftMonth:disc-spentM}}
+const ic={today:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',spend:'<path d="M12 5v14M5 12h14"/>',plan:'<path d="M4 6h16M4 12h16M4 18h10"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
+function nav(){$('#nav').innerHTML=[['today','Today'],['spend','Spend'],['plan','Plan'],['me','Account']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}"><svg viewBox="0 0 24 24">${ic[k]}</svg>${l}</button>`).join('')}
+$('#nav').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;msg='';render()}};
+function render(){nav();$('#app').innerHTML=views[tab]();scrollTo(0,0)}
+const views={
+today(){const c=calc(),ready=S.income>0,pct=c.safe>0?Math.min(1,c.spentT/c.safe):1,R=92,L=2*Math.PI*R,over=c.leftToday<0;
+const g=S.goal,gp=g.amount>0?Math.min(100,g.saved/g.amount*100):0;
+return`<h1>Hi 👋</h1><p class="sub">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p>
+<div class="card hero"><div class="lbl">${over?'Over today’s limit by':'You can safely spend today'}</div>
+<div class="ring"><svg width="210" height="210"><defs><linearGradient id="rg"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="105" cy="105" r="${R}" stroke="#1e3a31" stroke-width="14" fill="none"/><circle cx="105" cy="105" r="${R}" stroke="${over?'#fb7185':'url(#rg)'}" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L*(1-pct)}"/></svg>
+<div class="t"><div class="big ${over?'bad':''}">${ready?money2(Math.abs(c.leftToday)):'—'}</div><div class="lbl">of ${ready?money2(Math.max(0,c.safe)):'—'} daily</div></div></div>
+${ready?'':'<button class="w" data-go="plan">Set up your plan</button>'}</div>
+<div class="row" style="margin-bottom:12px"><input id="q" type="number" inputmode="decimal" placeholder="Log a purchase ($)"><button class="sm" id="qa">Add</button></div>
+<div class="grid"><div class="card"><span class="lbl">Left this month</span><b class="${c.leftMonth<0?'bad':''}">${money(c.leftMonth)}</b></div>
+<div class="card"><span class="lbl">Days left</span><b>${c.left}</b></div>
+<div class="card"><span class="lbl">Bills / month</span><b>${money(c.bills)}</b></div>
+<div class="card"><span class="lbl">Saving / month</span><b class="ok">${money(c.ms)}</b></div></div>
+${g.amount>0?`<h2>Goal${g.name?': '+esc(g.name):''}</h2><div class="card"><div class="item" style="border:0;padding:0"><span>${money(g.saved)} of ${money(g.amount)}</span><b>${gp.toFixed(0)}%</b></div><div class="bar"><i style="width:${gp}%"></i></div></div>`:''}
+${c.disc<0&&ready?'<div class="card bad">Your bills and goal exceed your income. Try a later goal date or a smaller goal.</div>':''}`},
+spend(){const l=[...S.spends].sort((a,b)=>b.t-a.t).slice(0,60);
+return`<h1>Spending</h1><p class="sub">Log what you spend so your daily number stays honest.</p>
+<div class="card"><label>Amount</label><input id="sa" type="number" inputmode="decimal" placeholder="0.00"><label>Note (optional)</label><input id="sn" placeholder="Coffee, gas, lunch…"><div style="height:12px"></div><button class="w" id="sadd">Add purchase</button></div>
+<h2>Recent</h2><div class="card">${l.length?l.map(s=>`<div class="item"><div>${esc(s.n||'Purchase')}<small>${s.d}</small></div><div>${money2(s.a)} <button class="x" data-del="${s.t}">✕</button></div></div>`).join(''):'<div class="empty">Nothing logged yet.</div>'}</div>`},
+plan(){const g=S.goal;return`<h1>Your plan</h1><p class="sub">Manual inputs only. Nothing is connected to your bank.</p>
+<div class="card"><label>Monthly income (after tax)</label><input id="inc" type="number" inputmode="decimal" value="${S.income||''}" placeholder="3000"></div>
+<h2>Monthly bills</h2><div class="card">${S.bills.map((b,i)=>`<div class="item"><div>${esc(b.name)}</div><div>${money2(b.amount)} <button class="x" data-bd="${i}">✕</button></div></div>`).join('')||'<div class="empty">No bills yet.</div>'}
+<div class="row" style="margin-top:10px"><input id="bn" placeholder="Rent"><input id="ba" type="number" inputmode="decimal" placeholder="$"><button class="sm" id="bad">Add</button></div></div>
+<h2>Savings goal</h2><div class="card"><label>What are you saving for?</label><input id="gn" value="${esc(g.name)}" placeholder="Trip, laptop, emergency fund">
+<label>Goal amount</label><input id="ga" type="number" inputmode="decimal" value="${g.amount||''}"><label>Already saved</label><input id="gs" type="number" inputmode="decimal" value="${g.saved||''}"><label>Target date</label><input id="gd" type="date" value="${g.date}"></div>`},
+me(){const nOk='Notification' in window,np=nOk?Notification.permission:'unsupported';
+return`<h1>Account</h1><p class="sub">${sb?(user?'Signed in as '+esc(user.email):'Sign in to sync across devices.'):'Supabase isn’t configured yet. Your data is saved on this device.'}</p>
+${sb?(user?'<button class="g w" id="out">Sign out</button>':`<div class="card"><label>Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div style="height:12px"></div><div class="row"><button id="in">Sign in</button><button class="g" id="up">Sign up</button></div></div>`):''}
+<p class="msg">${esc(msg)}</p>
+<h2>Daily reminder</h2><div class="card"><div class="item" style="border:0;padding:0"><span>Notify me with my safe number</span><button class="${S.notif.on?'':'g'} sm" id="nt">${S.notif.on?'On':'Off'}</button></div>
+<label>Time</label><input id="nz" type="time" value="${S.notif.time}"><p class="msg">${nOk?'Permission: '+np+'. Reminders fire when the app is opened after your set time.':'Notifications aren’t supported in this browser. On iPhone, add to Home Screen first.'}</p></div>
+<h2>Install</h2><div class="card msg" style="margin:0">iPhone: Share → Add to Home Screen. Android: menu → Install app.</div>`}};
+const A=$('#app');
+A.addEventListener('click',async e=>{const t=e.target,id=t.id;
+if(t.dataset.go){tab=t.dataset.go;return render()}
+if(t.dataset.del){S.spends=S.spends.filter(s=>s.t!=t.dataset.del);save();return render()}
+if(t.dataset.bd){S.bills.splice(+t.dataset.bd,1);save();return render()}
+if(id==='qa'||id==='sadd'){const a=parseFloat($(id==='qa'?'#q':'#sa').value);if(!(a>0))return;S.spends.push({a,n:id==='sadd'?$('#sn').value.trim():'',d:iso(new Date()),t:Date.now()});save();render();if(calc().leftToday<0&&S.notif.on)notify('Over today’s limit','You’re over by '+money2(-calc().leftToday));return}
+if(id==='bad'){const n=$('#bn').value.trim(),a=parseFloat($('#ba').value);if(n&&a>0){S.bills.push({name:n,amount:a});save();render()}return}
+if(id==='nt'){if(!S.notif.on){if(!('Notification' in window))return;const p=await Notification.requestPermission();if(p!=='granted'){msg='Permission was blocked in your browser settings.';return render()}S.notif.on=true;save();notify('Notifications on','You’ll get your safe number each day.')}else{S.notif.on=false;save()}render()}
+if(id==='in'||id==='up'){const em=$('#em').value,pw=$('#pw').value;const r=id==='in'?await sb.auth.signInWithPassword({email:em,password:pw}):await sb.auth.signUp({email:em,password:pw});msg=r.error?r.error.message:(id==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
+if(id==='out'){await sb.auth.signOut();user=null;render()}});
+A.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;
+const m={inc:()=>S.income=+v||0,gn:()=>S.goal.name=v,ga:()=>S.goal.amount=+v||0,gs:()=>S.goal.saved=+v||0,gd:()=>S.goal.date=v,nz:()=>S.notif.time=v};if(m[i]){m[i]();save()}});
+async function notify(title,body){body=body||('You can spend '+money2(Math.max(0,calc().leftToday))+' today.');title=title||'SafeSpend';
+try{const r=await navigator.serviceWorker.getRegistration();r?r.showNotification(title,{body,icon:'icon.svg',badge:'icon.svg'}):new Notification(title,{body})}catch(e){}}
+function checkReminder(){if(!S.notif.on||!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n);if(S.notif.last===t)return;
+const[h,m]=S.notif.time.split(':');if(n.getHours()*60+n.getMinutes()>=+h*60+ +m){S.notif.last=t;save();notify()}}
+setInterval(checkReminder,6e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminder();if(tab==='today')render()}});
+async function onUser(u){user=u;const{data}=await sb.from('user_data').select('data').eq('user_id',u.id).maybeSingle();
+if(data&&data.data&&Object.keys(data.data).length){S=Object.assign(def(),data.data);localStorage.setItem(KEY,JSON.stringify(S))}else save()}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+(async()=>{if(sb){const{data}=await sb.auth.getSession();if(data.session)await onUser(data.session.user)}render();checkReminder()})();
+</script></body></html>
