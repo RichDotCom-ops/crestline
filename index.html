@@ -1,151 +1,130 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SafeSpend</title><meta name="theme-color" content="#f3faf6">
+<title>SafeSpend</title><meta name="theme-color" content="#0f1110">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="SafeSpend">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="SafeSpend">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
 <style>
-:root{--bg:#f3faf6;--card:#fff;--card2:#eef7f1;--tx:#0a2a1d;--mu:#5d7b6e;--ac:#10b981;--dp:#064e3b;--bad:#e11d48;--ln:#e0eee6;--sh:0 1px 2px rgba(6,78,59,.05),0 10px 28px -10px rgba(6,78,59,.14)}
+:root{--bg:#0f1110;--cd:#1a1d1b;--c2:#252927;--tx:#f4f6f2;--mu:#8d948e;--ac:#ccf35a;--ln:#2b302d;--bad:#ff7b7b}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-body{padding:env(safe-area-inset-top) 0 0;min-height:100dvh;background:radial-gradient(70% 40% at 100% 0,#c9f2de 0,transparent 70%),radial-gradient(60% 35% at 0 30%,#e3f7ec 0,transparent 70%),var(--bg)}
-main{max-width:520px;margin:0 auto;padding:20px 18px calc(120px + env(safe-area-inset-bottom))}
-main>*{animation:up .55s cubic-bezier(.2,.8,.2,1) both}main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}main>*:nth-child(4){animation-delay:.15s}main>*:nth-child(n+5){animation-delay:.2s}
-@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-h1{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:6px 0 2px}
-h2{font-size:12px;color:var(--mu);font-weight:700;margin:26px 4px 10px;text-transform:uppercase;letter-spacing:.1em}
-.sub{color:var(--mu);margin:0 0 18px;font-size:14px}
-.card{background:var(--card);border:1px solid var(--ln);border-radius:26px;padding:18px;margin-bottom:12px;box-shadow:var(--sh)}
-.hero{text-align:center;padding:26px 16px 22px;color:#fff;border:0;border-radius:34px;background:radial-gradient(110% 80% at 90% 0,rgba(110,231,183,.55) 0,transparent 55%),linear-gradient(160deg,#059669,#064e3b);box-shadow:0 24px 44px -18px rgba(6,78,59,.6)}
-.hero .lbl{color:rgba(255,255,255,.78);font-weight:500}.hero .bad{color:#fecdd3}
-.ring{position:relative;width:210px;height:210px;margin:8px auto 14px}
-.ring svg{transform:rotate(-90deg)}.ring circle{transition:stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)}
-.ring .t{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.big{font-size:44px;font-weight:800;letter-spacing:-.04em}.lbl{color:var(--mu);font-size:13px}
-.bad{color:var(--bad)}.ok{color:#059669}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid .card{margin:0;padding:16px}.grid b{display:block;font-size:22px;margin-top:4px;letter-spacing:-.02em}
-.grid .card:first-child{grid-column:span 2;background:linear-gradient(135deg,#ecfdf5,#fff)}.grid .card:first-child b{font-size:32px}
-input,select{width:100%;background:var(--card2);border:1.5px solid transparent;color:var(--tx);border-radius:16px;padding:14px 15px;font:inherit;outline:none;transition:.2s}
-input::placeholder{color:#9db8ac}input:focus{border-color:var(--ac);background:#fff;box-shadow:0 0 0 4px rgba(16,185,129,.15)}
-label{display:block;font-size:13px;font-weight:600;color:var(--mu);margin:12px 0 6px}
-.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.row>.sm{flex:0 0 auto}
-button{font:inherit;border:0;border-radius:16px;padding:14px 18px;font-weight:700;color:#fff;background:linear-gradient(135deg,#10b981,#047857);box-shadow:0 8px 18px -8px rgba(5,150,105,.7);cursor:pointer;transition:transform .15s}
-button:active{transform:scale(.96)}
-button.g{background:var(--card2);color:var(--dp);box-shadow:none}button.x{background:none;color:#9db8ac;padding:6px 10px;box-shadow:none}button.w{width:100%}
-button.wh{background:#fff;color:var(--dp);box-shadow:none}
-.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}.item:last-child{border:0}
-.item small{color:var(--mu);display:block}.bar{height:12px;background:var(--card2);border-radius:9px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#059669);border-radius:9px}
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));width:min(420px,calc(100% - 24px));display:flex;gap:4px;padding:6px;background:rgba(255,255,255,.78);backdrop-filter:blur(22px) saturate(1.8);-webkit-backdrop-filter:blur(22px) saturate(1.8);border:1px solid rgba(255,255,255,.95);border-radius:30px;box-shadow:0 16px 40px -12px rgba(6,78,59,.35)}
-nav button{flex:1;background:none;color:var(--mu);box-shadow:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:9px 0;border-radius:24px}
-nav button.on{background:var(--dp);color:#fff}nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.msg{font-size:13px;color:var(--mu);margin-top:8px}.empty{text-align:center;color:var(--mu);padding:14px}
-.pig{text-align:center;background:linear-gradient(180deg,#f0fdf6,#fff);overflow:hidden}.pig .big{margin-top:4px;font-size:40px;color:var(--dp)}
-.bubble{display:inline-block;background:#fff;border:1.5px solid var(--ln);border-radius:18px;padding:7px 14px;font-weight:700;font-size:14px;color:var(--dp);box-shadow:var(--sh);animation:pop .6s both}
-.ms{display:flex;gap:6px;justify-content:center;margin-top:14px}.ms span{font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--card2);color:#9db8ac;filter:grayscale(1)}.ms span.on{background:#d1fae5;color:var(--dp);filter:none;animation:pop .5s both}
-.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.chips button{padding:12px 0}
-.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;background:var(--dp);color:#fff;padding:11px 18px;border-radius:99px;font-weight:700;z-index:100;box-shadow:0 12px 30px -8px rgba(6,78,59,.5);animation:toast 2.4s both}
-.lvl{transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}.bob{animation:bob 3s ease-in-out infinite;transform-origin:120px 112px}.eye{transform-origin:160px 94px;animation:blink 4s infinite}.coin{animation:coin 3s infinite}
-@keyframes pop{from{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}to{transform:scale(1);opacity:1}}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 Manrope,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:430px;margin:0 auto;min-height:100dvh;padding:calc(14px + env(safe-area-inset-top)) 18px calc(110px + env(safe-area-inset-bottom))}
+main>*{animation:up .45s cubic-bezier(.2,.8,.2,1) both}main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}main>*:nth-child(n+4){animation-delay:.15s}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+small{color:var(--mu);font-size:12.5px}h1{font-size:34px;line-height:1.1;letter-spacing:-.03em;margin:18px 0 10px;text-align:center}h1 span{color:var(--mu)}
+h2{font-size:18px;margin:0}.bad{color:var(--bad)}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}.gr{flex:1;display:flex;flex-direction:column}.gr b{font-size:17px}
+.av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ccf35a,#6fd6a0);color:#0f1110;display:grid;place-items:center;font-weight:800;font-size:18px}
+button{font:inherit;border:0;cursor:pointer;transition:transform .15s}button:active{transform:scale(.96)}
+.ib{width:40px;height:40px;border-radius:50%;background:var(--c2);border:1px solid var(--ln);display:grid;place-items:center;padding:0;color:var(--tx);font-size:18px}
+.ib svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.plus{width:44px;height:44px;border-radius:50%;background:var(--ac);color:#0f1110;font-size:26px;font-weight:700;display:grid;place-items:center;padding:0}
+.pri{background:var(--ac);color:#0f1110;font-weight:800;border-radius:99px;padding:17px;width:100%;font-size:16px}.pri.sm{width:auto;padding:12px 20px;font-size:14px}
+.ghost{background:var(--c2);color:var(--tx);font-weight:700;border-radius:99px;padding:12px 18px}.x{background:none;color:var(--mu);padding:4px 8px}
+.dock{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);padding:30px 18px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 40%)}
+.card,.bal,.gc{background:var(--cd);border:1px solid var(--ln);border-radius:24px;padding:16px;margin-bottom:12px}
+.bal{display:flex;justify-content:space-between;align-items:center;padding:16px 14px 16px 18px}.bal .r{display:flex;gap:7px;align-items:center}
+.amt{font-size:32px;font-weight:800;letter-spacing:-.03em}.amt2{font-size:38px;font-weight:800;letter-spacing:-.03em;color:var(--ac)}.amt2.bad{color:var(--bad)}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:22px 2px 12px}.sh a{color:var(--mu);font-size:13px;cursor:pointer}
+.gc{display:flex;gap:12px;align-items:center;padding:12px;cursor:pointer}.gb{flex:1;min-width:0}.gb b{display:block;font-size:16px}.gm{font-weight:700;margin-top:2px}.gm span{color:var(--mu);font-weight:500}
+.tl{width:66px;height:66px;border-radius:18px;background:radial-gradient(circle at 30% 20%,#3b4d3a,#1a1e1b);display:grid;place-items:center;font-size:34px;flex:none}.dots{color:var(--mu);font-size:20px;align-self:flex-start}
+.bar{height:6px;background:var(--c2);border-radius:9px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--ac);border-radius:9px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+input{width:100%;background:var(--c2);border:1.5px solid transparent;color:var(--tx);border-radius:16px;padding:14px 15px;font:inherit;outline:none}input:focus{border-color:var(--ac)}input::placeholder{color:#667068}
+label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0 6px}.row{display:flex;gap:8px;align-items:center}.row>input{flex:1;min-width:0}
+.chs,.ems{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}.ems{flex-wrap:wrap}
+.chp{padding:10px 16px;border-radius:99px;background:var(--c2);color:var(--tx);font-weight:700;white-space:nowrap;border:1px solid var(--ln)}.chp.on{background:var(--ac);color:#0f1110;border-color:var(--ac)}
+.hero{height:240px;border-radius:30px;display:grid;place-items:center;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 30%,#3d5039,#161917 72%);border:1px solid var(--ln)}
+.big{font-size:104px;animation:bob 3s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px) rotate(-3deg)}}
+.ov{position:absolute;left:18px;right:18px;bottom:16px;display:flex;justify-content:space-between;align-items:flex-end}.ov b{font-size:17px}
+.pill{background:var(--ac);color:#0f1110;font-weight:800;border-radius:99px;padding:6px 13px;font-size:13px}
+.tr{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}.tr:last-child{border:0}.tr small{display:block}
+.empty{text-align:center;color:var(--mu);padding:14px;font-size:14px}.msg{font-size:13px;color:var(--mu);margin-top:8px}
+h2+.card,.card+h2{margin-top:0}main>h2{margin:22px 2px 10px}
+.ot{display:flex;align-items:center;gap:14px}.ot small{width:30px}.ot a{color:var(--mu);cursor:pointer}.pl{flex:1;height:3px;background:var(--c2);border-radius:9px}.pl i{display:block;height:100%;background:var(--ac);border-radius:9px;transition:width .5s}
+.art{display:grid;place-items:center;margin:22px 0 6px}.cp{color:var(--mu);text-align:center;line-height:1.5;margin:0 12px}.fl{animation:bob 3s ease-in-out infinite}.fl:nth-child(even){animation-delay:-1.5s}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;background:var(--ac);color:#0f1110;padding:11px 18px;border-radius:99px;font-weight:800;z-index:100;animation:toast 2.4s both}
 @keyframes toast{0%{opacity:0;transform:translate(-50%,-20px)}10%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
-@keyframes bob{50%{transform:translateY(-5px) rotate(-1deg)}}@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
-@keyframes coin{0%{transform:translateY(-6px);opacity:0}15%{opacity:1}60%{transform:translateY(36px);opacity:1}75%,100%{transform:translateY(44px) scale(.6);opacity:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style></head><body><main id="app"></main>
-<nav id="nav"></nav>
+</style></head><body><main id="app"></main><div id="dock"></div>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script>
-const $=s=>document.querySelector(s),KEY='safespend.v1',CFG=window.CONFIG||{};
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),KEY='safespend.v2',CFG=window.CONFIG||{};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
-const money2=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(n||0);
-const iso=d=>d.toLocaleDateString('en-CA'),sum=a=>a.reduce((x,y)=>x+ +y.a,0);
-const def=()=>({income:0,bills:[],goal:{name:'',amount:0,saved:0,date:''},spends:[],deposits:[],notif:{on:false,time:'09:00',last:''}});
-const sv=()=>(+S.goal.saved||0)+S.deposits.reduce((x,y)=>x+y.a,0);let shown=0;
-let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||'{}')),tab='today',sb=null,user=null,msg='',t0;
+const M=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
+const iso=d=>d.toLocaleDateString('en-CA'),fd=d=>new Date(d+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+const sum=(a,f)=>a.reduce((x,y)=>x+ +f(y),0);
+const def=()=>({name:'',done:false,income:0,bills:[],spends:[],goals:[],tx:[],hide:false,notif:{on:false,time:'09:00',last:''}});
+let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('safespend.v1')||'{}'));
+if(S.goal&&S.goal.amount>0&&!S.goals.length){const d=S.deposits||[],id='g1';S.goals=[{id,name:S.goal.name||'My goal',tag:'',amount:+S.goal.amount,date:S.goal.date||'',emoji:'🎯',saved:(+S.goal.saved||0)+sum(d,x=>x.a)}];S.tx=d.map(x=>({id,a:x.a,d:x.d,t:x.t}));S.done=true}
+delete S.goal;delete S.deposits;
+let V=S.done?'home':'onb',ob=0,pick=10,em='🎯',all=false,msg='',sb=null,user=null,t0;
 if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
 function save(){localStorage.setItem(KEY,JSON.stringify(S));if(sb&&user){clearTimeout(t0);t0=setTimeout(()=>sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()}),600)}}
-function calc(){const now=new Date(),dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),left=dim-now.getDate()+1;
-const bills=sum(S.bills.map(b=>({a:b.amount}))),g=S.goal;let ms=0;
-if(+g.amount>sv()&&g.date){const days=(new Date(g.date+'T23:59')-now)/864e5;ms=(g.amount-sv())/Math.max(1,Math.ceil(days/30.44))}
-const disc=S.income-bills-ms,ym=iso(now).slice(0,7),td=iso(now);
-const spentM=sum(S.spends.filter(s=>s.d.startsWith(ym))),spentT=sum(S.spends.filter(s=>s.d===td));
-const safe=(disc-(spentM-spentT))/left;
-return{left,bills,ms,disc,spentM,spentT,safe,leftToday:safe-spentT,leftMonth:disc-spentM}}
-const ic={today:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',spend:'<path d="M12 5v14M5 12h14"/>',plan:'<path d="M4 6h16M4 12h16M4 18h10"/>',save:'<path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
-function nav(){$('#nav').innerHTML=[['today','Today'],['spend','Spend'],['save','Save'],['plan','Plan'],['me','Me']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}"><svg viewBox="0 0 24 24">${ic[k]}</svg>${l}</button>`).join('')}
-$('#nav').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;msg='';render()}};
-function render(){nav();$('#app').innerHTML=views[tab]();scrollTo(0,0);if(tab==='save')pigIn()}
-const PIG=p=>`<svg viewBox="0 0 240 200" width="240" height="200" style="max-width:100%"><defs><clipPath id="pc"><ellipse cx="120" cy="112" rx="80" ry="62"/></clipPath><linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient></defs><g class="bob"><path d="M74 72L64 36l36 18z" fill="#6ee7b7" stroke="#10b981" stroke-width="4" stroke-linejoin="round"/><path d="M146 56l32-18-6 38z" fill="#6ee7b7" stroke="#10b981" stroke-width="4" stroke-linejoin="round"/><rect x="76" y="160" width="26" height="26" rx="10" fill="#34d399"/><rect x="138" y="160" width="26" height="26" rx="10" fill="#34d399"/><path d="M42 108c-18-6-14-26 0-20" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round"/><g class="coin"><circle cx="120" cy="22" r="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/><text x="120" y="27" text-anchor="middle" font-size="14" font-weight="800" fill="#b45309">$</text></g><ellipse cx="120" cy="112" rx="80" ry="62" fill="#d1fae5"/><g clip-path="url(#pc)"><rect class="lvl" x="30" y="50" width="180" height="130" fill="url(#pf)" opacity=".7" data-p="${p}" style="transform:translateY(124px)"/></g><ellipse cx="120" cy="112" rx="80" ry="62" fill="none" stroke="#10b981" stroke-width="4"/><rect x="105" y="52" width="30" height="6" rx="3" fill="#064e3b"/><ellipse cx="192" cy="116" rx="17" ry="14" fill="#6ee7b7" stroke="#10b981" stroke-width="3"/><circle cx="186" cy="116" r="3" fill="#064e3b"/><circle cx="198" cy="116" r="3" fill="#064e3b"/><circle cx="162" cy="116" r="8" fill="#fda4af" opacity=".7"/><circle class="eye" cx="160" cy="94" r="5.5" fill="#064e3b"/></g></svg>`;
-function pigIn(){requestAnimationFrame(()=>requestAnimationFrame(()=>{const l=$('.lvl');if(l)l.style.transform=`translateY(${(1-l.dataset.p)*124}px)`}));const el=$('#cnt'),to=sv(),from=shown,t=performance.now();shown=to;
-if(!el)return;(function f(n){const k=Math.min(1,(n-t)/1100),e=1-Math.pow(1-k,3);el.textContent=money2(from+(to-from)*e);if(k<1)requestAnimationFrame(f)})(t)}
-function burst(n){const cs=['#10b981','#34d399','#fbbf24','#a7f3d0','#fda4af','#fff'];for(let i=0;i<n;i++){const e=document.createElement('i'),z=6+Math.random()*8;Object.assign(e.style,{position:'fixed',left:'50%',top:'38%',width:z+'px',height:z+'px',borderRadius:i%2?'50%':'2px',background:cs[i%cs.length],zIndex:99,pointerEvents:'none'});document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*180;e.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+120}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove()}}
+function calc(){const n=new Date(),dim=new Date(n.getFullYear(),n.getMonth()+1,0).getDate(),left=dim-n.getDate()+1,bills=sum(S.bills,b=>b.amount);let ms=0;
+S.goals.forEach(g=>{if(g.date&&g.amount>g.saved){const d=(new Date(g.date+'T23:59')-n)/864e5;ms+=(g.amount-g.saved)/Math.max(1,Math.ceil(d/30.44))}});
+const disc=S.income-bills-ms,ym=iso(n).slice(0,7),td=iso(n),sm=sum(S.spends.filter(s=>s.d.startsWith(ym)),s=>s.a),st=sum(S.spends.filter(s=>s.d===td),s=>s.a),safe=(disc-(sm-st))/left;
+return{left,bills,ms,disc,sm,st,safe,lt:safe-st}}
+const I={set:'<svg viewBox="0 0 24 24"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h-1"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>',eye:'<svg viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',clk:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',back:'<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>'};
+const coin=(x,y,r,d)=>`<g class="fl" style="animation-delay:${d}s"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*1.2}" fill="#ccf35a" transform="rotate(-20 ${x} ${y})"/><text x="${x}" y="${y+r*.4}" text-anchor="middle" font-size="${r}" font-weight="800" fill="#0f1110">$</text></g>`;
+const ART=`<svg viewBox="0 0 260 220" width="270"><g fill="none" stroke="#f4f6f2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M96 70c-14 14-22 34-22 62 0 34 18 54 56 54s56-20 56-54c0-28-8-48-22-62"/><path d="M104 70v-14h52v14"/><path d="M98 70h64M92 120c14 10 62 10 76 0"/><path d="M30 110c14-6 24 2 34 18M232 100c-10 4-18 14-22 28"/></g>${coin(70,50,13,0)}${coin(196,52,15,-.6)}${coin(40,150,11,-1.1)}${coin(224,160,12,-1.7)}${coin(130,30,10,-2.2)}<g fill="#ccf35a"><path d="M214 20l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></g></svg>`;
+const OB=[['Set Your Goals.','Start Saving.','Create goals, track your progress, and watch your savings grow — one step at a time.'],['Know Your Number.','Spend Smart.','Add your income and bills and we’ll show what’s safe to spend today.'],['Top Up.','Celebrate.','Drop money into each goal and watch the progress climb.'],['What should we','call you?','']];
+const txr=(x,n)=>{const g=n&&S.goals.find(y=>y.id===x.id);return`<div class="tr"><div>${fd(x.d)}${g?'<small>'+g.emoji+' '+esc(g.name)+'</small>':''}</div><b class="${x.a<0?'bad':''}">${x.a<0?'−':'+'}${M(Math.abs(x.a))}</b></div>`};
+const gc=g=>{const p=g.amount>0?Math.min(100,g.saved/g.amount*100):0;return`<div class="gc" data-a="go" data-v="g:${g.id}"><div class="tl">${g.emoji}</div><div class="gb"><small>${esc(g.tag||'Goal')}</small><b>${esc(g.name)}</b><div class="gm">${M(g.saved)} <span>/${M(g.amount)}</span></div><div class="bar"><i style="width:${p}%"></i></div></div><span class="dots">⋮</span></div>`};
+const dock=(a,t,v)=>`<div class="dock"><button class="pri" data-a="${a}"${v?` data-v="${v}"`:''}>${t}</button></div>`;
+const bk=t=>`<div class="top"><button class="ib" data-a="go" data-v="home">${I.back}</button><div class="gr"><b>${t}</b></div></div>`;
+const P={
+onb(){const o=OB[ob],last=ob===3;return[`<div class="ot"><small>${ob+1}/4</small><div class="pl"><i style="width:${(ob+1)*25}%"></i></div><a data-a="skip">Skip</a></div><div class="art">${ART}</div><h1>${o[0]}<br><span>${o[1]}</span></h1>${last?`<input id="nm" placeholder="Your name" value="${esc(S.name)}" autocomplete="given-name">`:`<p class="cp">${o[2]}</p>`}`,dock('next',last?'Get started':'Continue')]},
+home(){const c=calc(),tot=sum(S.goals,g=>g.saved),gs=all?S.goals:S.goals.slice(0,3),ok=S.income>0,p=ok&&c.safe>0?Math.min(100,c.st/c.safe*100):0;
+return[`<div class="top"><div class="av">${esc((S.name||'U')[0].toUpperCase())}</div><div class="gr"><b>Hello, ${esc(S.name||'there')}</b><small>Turn dreams into achieved goals</small></div><button class="ib" data-a="go" data-v="set">${I.set}</button></div>
+<div class="bal"><div><small>Current balance (USD)</small><div class="amt">${S.hide?'••••••':M(tot)}</div></div><div class="r"><button class="ib" data-a="eye">${I.eye}</button><button class="ib" data-a="go" data-v="hist">${I.clk}</button><button class="plus" data-a="go" data-v="new">+</button></div></div>
+<div class="card"><small>Safe to spend today</small>${ok?`<div class="amt2 ${c.lt<0?'bad':''}">${c.lt<0?'−':''}${M(Math.abs(c.lt))}</div><small>${c.lt<0?'over your daily limit of ':'left of '}${M(Math.max(0,c.safe))} a day</small><div class="bar"><i style="width:${p}%"></i></div><div class="row" style="margin-top:14px"><input id="sq" type="number" inputmode="decimal" placeholder="Log a purchase ($)"><button class="pri sm" data-a="sp">Add</button></div>`:`<div class="amt2">—</div><small>Add your income and bills to see your daily number.</small><div style="margin-top:12px"><button class="pri sm" data-a="go" data-v="set">Set up plan</button></div>`}</div>
+<div class="sh"><h2>My goals</h2>${S.goals.length>3?`<a data-a="all">${all?'Show less':'View All ›'}</a>`:''}</div>${gs.map(gc).join('')||'<div class="empty">No goals yet. Create your first one!</div>'}`,dock('go','+ New goal','new')]},
+g(id){const g=S.goals.find(x=>x.id===id);if(!g){V='home';return P.home()}const p=g.amount>0?Math.round(Math.min(100,g.saved/g.amount*100)):0,tx=S.tx.filter(x=>x.id===id).sort((a,b)=>b.t-a.t),l=all?tx:tx.slice(0,5);
+return[`<div class="top"><button class="ib" data-a="go" data-v="home">${I.back}</button><div class="gr"><b>${esc(g.tag||'Goal')}</b></div><button class="ib" data-a="dg">⋮</button></div>
+<div class="chs">${[5,10,50,100,200].map(v=>`<button class="chp ${pick===v?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div>
+<div class="hero"><span class="big">${g.emoji}</span><div class="ov"><div><b>${esc(g.name)}</b><div class="amt">${M(g.saved)}</div></div><span class="pill">${p}%</span></div></div>
+<div class="row" style="margin:12px 0 0"><input id="ca" type="number" inputmode="decimal" placeholder="Or custom amount"><button class="ghost" data-a="out">Take out</button></div>
+<div class="sh"><h2>Transaction history</h2>${tx.length>5?`<a data-a="all">${all?'Show less':'View All ›'}</a>`:''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">Nothing yet. Top up to drop your first coin!</div>'}</div>`,dock('top','Top up goal balance')]},
+hist(){const l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,100);return[bk('Transaction history')+`<div class="card">${l.map(x=>txr(x,1)).join('')||'<div class="empty">No transactions yet.</div>'}</div>`]},
+new(){return[bk('New goal')+`<div class="ems">${['🎯','🧸','🎧','👟','💻','📱','🎮','🏖️','🚗','🎁'].map(e=>`<button class="chp ${e===em?'on':''}" data-a="em" data-v="${e}">${e}</button>`).join('')}</div>
+<label>Goal name</label><input id="gn" placeholder="Labubu, AirPods, Sneakers…"><label>Category (optional)</label><input id="gt" placeholder="Pop Mart"><label>Target amount</label><input id="ga" type="number" inputmode="decimal" placeholder="500"><label>Already saved (optional)</label><input id="gs" type="number" inputmode="decimal" placeholder="0"><label>Target date (optional)</label><input id="gd" type="date">`,dock('mk','Create goal')]},
+set(){const rec=[...S.spends].sort((a,b)=>b.t-a.t).slice(0,15),nO='Notification' in window;
+return[bk('Settings')+`<h2>You</h2><div class="card" style="margin-top:10px"><label style="margin-top:0">Name</label><input id="nm2" value="${esc(S.name)}"></div>
+<h2>Monthly plan</h2><div class="card" style="margin-top:10px"><label style="margin-top:0">Income (after tax)</label><input id="inc" type="number" inputmode="decimal" value="${S.income||''}" placeholder="3000"><label>Bills</label>${S.bills.map((b,i)=>`<div class="tr"><span>${esc(b.name)}</span><span>${M(b.amount)} <button class="x" data-a="db" data-v="${i}">✕</button></span></div>`).join('')}<div class="row" style="margin-top:8px"><input id="bn" placeholder="Rent"><input id="ba" type="number" inputmode="decimal" placeholder="$"><button class="pri sm" data-a="ab">Add</button></div></div>
+<h2>Recent spending</h2><div class="card" style="margin-top:10px">${rec.map(s=>`<div class="tr"><div>${M(s.a)}<small>${fd(s.d)}</small></div><button class="x" data-a="ds" data-v="${s.t}">✕</button></div>`).join('')||'<div class="empty">Nothing logged yet.</div>'}</div>
+<h2>Daily reminder</h2><div class="card" style="margin-top:10px"><div class="tr" style="border:0;padding-top:0"><span>Notify me my safe number</span><button class="${S.notif.on?'pri sm':'ghost'}" data-a="nt">${S.notif.on?'On':'Off'}</button></div><label>Time</label><input id="nz" type="time" value="${S.notif.time}"><p class="msg">${nO?'Reminders fire when the app is opened after your set time.':'Not supported here. On iPhone, add to Home Screen first.'}</p></div>
+<h2>Account</h2><div class="card" style="margin-top:10px">${sb?(user?`<small>Signed in as ${esc(user.email)}</small><div style="height:10px"></div><button class="ghost" data-a="so">Sign out</button>`:`<label style="margin-top:0">Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div class="row" style="margin-top:12px"><button class="pri sm" data-a="in">Sign in</button><button class="ghost" data-a="up">Sign up</button></div>`):'<small>Accounts aren’t set up yet. Your data is saved on this device.</small>'}<p class="msg">${esc(msg)}</p></div>`]}};
+function render(){const[v,id]=V.split(':'),h=P[v](id);$('#app').innerHTML=h[0];$('#dock').innerHTML=h[1]||'';scrollTo(0,0)}
+function burst(n){const cs=['#ccf35a','#f4f6f2','#6fd6a0','#fbbf24'];for(let i=0;i<n;i++){const e=document.createElement('i'),z=6+Math.random()*8;Object.assign(e.style,{position:'fixed',left:'50%',top:'40%',width:z+'px',height:z+'px',borderRadius:i%2?'50%':'2px',background:cs[i%4],zIndex:99,pointerEvents:'none'});document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*180;e.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+120}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove()}}
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2500)}
-function addDep(a,n){const g=S.goal,b=g.amount>0?sv()/g.amount:0;S.deposits.push({a,n:n||'',d:iso(new Date()),t:Date.now()});save();const f=g.amount>0?sv()/g.amount:0;render();
-if(a>0){burst(22);const m=[.25,.5,.75,1].filter(x=>b<x&&f>=x).pop();if(m){burst(70);const t=m>=1?'🎉 Goal reached!':'🎉 '+m*100+'% of your goal!';toast(t);if(S.notif.on)notify('Milestone!',t)}else toast('+'+money2(a)+' saved 🐷')}else toast('Took out '+money2(-a))}
-const views={
-today(){const c=calc(),ready=S.income>0,pct=c.safe>0?Math.min(1,c.spentT/c.safe):1,R=92,L=2*Math.PI*R,over=c.leftToday<0;
-const g=S.goal,gp=g.amount>0?Math.min(100,sv()/g.amount*100):0;
-return`<h1>${new Date().getHours()<12?'Good morning':new Date().getHours()<18?'Good afternoon':'Good evening'} 👋</h1><p class="sub">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p>
-<div class="card hero"><div class="lbl">${over?'Over today’s limit by':'You can safely spend today'}</div>
-<div class="ring"><svg width="210" height="210"><defs><linearGradient id="rg"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="105" cy="105" r="${R}" stroke="rgba(255,255,255,.2)" stroke-width="14" fill="none"/><circle cx="105" cy="105" r="${R}" stroke="${over?'#fecdd3':'#fff'}" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L*(1-pct)}"/></svg>
-<div class="t"><div class="big ${over?'bad':''}">${ready?money2(Math.abs(c.leftToday)):'—'}</div><div class="lbl">of ${ready?money2(Math.max(0,c.safe)):'—'} daily</div></div></div>
-${ready?'':'<button class="w wh" data-go="plan">Set up your plan</button>'}</div>
-<div class="row" style="margin-bottom:12px"><input id="q" type="number" inputmode="decimal" placeholder="Log a purchase ($)"><button class="sm" id="qa">Add</button></div>
-<div class="grid"><div class="card"><span class="lbl">Left this month</span><b class="${c.leftMonth<0?'bad':''}">${money(c.leftMonth)}</b></div>
-<div class="card"><span class="lbl">Days left</span><b>${c.left}</b></div>
-<div class="card"><span class="lbl">Bills / month</span><b>${money(c.bills)}</b></div>
-<div class="card"><span class="lbl">Saving / month</span><b class="ok">${money(c.ms)}</b></div></div>
-${g.amount>0?`<h2>Goal${g.name?': '+esc(g.name):''}</h2><div class="card"><div class="item" style="border:0;padding:0"><span>${money(sv())} of ${money(g.amount)}</span><b>${gp.toFixed(0)}%</b></div><div class="bar"><i style="width:${gp}%"></i></div></div>`:''}
-${c.disc<0&&ready?'<div class="card bad">Your bills and goal exceed your income. Try a later goal date or a smaller goal.</div>':''}`},
-save(){const g=S.goal,t=sv(),p=g.amount>0?Math.min(1,Math.max(0,t/g.amount)):0,pc=Math.round(p*100),
-mood=!g.amount?'Set a goal in Plan so I know how big to get!':p===0?'Feed me some coins! 🪙':p<.25?'Yum! More please':p<.5?'Getting chubby 😋':p<.75?'Over halfway! 🎈':p<1?'Almost full!! 🤩':'I’m full! You did it 🎉',
-h=[...S.deposits].sort((a,b)=>b.t-a.t).slice(0,40);
-return`<h1>Piggy bank</h1><p class="sub">${g.name?'Saving for '+esc(g.name):'Every coin counts.'}</p>
-<div class="card pig"><div class="bubble">${mood}</div>${PIG(p)}<div class="big" id="cnt">${money2(shown)}</div><div class="lbl">${g.amount>0?pc+'% of '+money(g.amount)+' · '+money(Math.max(0,g.amount-t))+' to go':'saved so far'}</div><div class="bar"><i style="width:${pc}%"></i></div>
-<div class="ms">${[25,50,75,100].map(m=>`<span class="${pc>=m?'on':''}">${m===100?'🏆':'⭐'} ${m}%</span>`).join('')}</div></div>
-<div class="chips">${[5,10,25,50].map(v=>`<button class="g" data-q="${v}">+$${v}</button>`).join('')}</div>
-<div class="card"><label>Amount</label><input id="da" type="number" inputmode="decimal" placeholder="0.00"><label>Note (optional)</label><input id="dn" placeholder="Birthday money, paycheck…"><div style="height:12px"></div><div class="row"><button id="dep">Add to savings</button><button class="g" id="wd">Take out</button></div></div>
-<h2>History</h2><div class="card">${h.length?h.map(s=>`<div class="item"><div>${esc(s.n||(s.a>0?'Deposit':'Withdrawal'))}<small>${s.d}</small></div><div class="${s.a>0?'ok':'bad'}">${s.a>0?'+':'−'}${money2(Math.abs(s.a))} <button class="x" data-dd="${s.t}">✕</button></div></div>`).join(''):'<div class="empty">No savings logged yet. Drop in your first coin!</div>'}</div>`},
-spend(){const l=[...S.spends].sort((a,b)=>b.t-a.t).slice(0,60);
-return`<h1>Spending</h1><p class="sub">Log what you spend so your daily number stays honest.</p>
-<div class="card"><label>Amount</label><input id="sa" type="number" inputmode="decimal" placeholder="0.00"><label>Note (optional)</label><input id="sn" placeholder="Coffee, gas, lunch…"><div style="height:12px"></div><button class="w" id="sadd">Add purchase</button></div>
-<h2>Recent</h2><div class="card">${l.length?l.map(s=>`<div class="item"><div>${esc(s.n||'Purchase')}<small>${s.d}</small></div><div>${money2(s.a)} <button class="x" data-del="${s.t}">✕</button></div></div>`).join(''):'<div class="empty">Nothing logged yet.</div>'}</div>`},
-plan(){const g=S.goal;return`<h1>Your plan</h1><p class="sub">Manual inputs only. Nothing is connected to your bank.</p>
-<div class="card"><label>Monthly income (after tax)</label><input id="inc" type="number" inputmode="decimal" value="${S.income||''}" placeholder="3000"></div>
-<h2>Monthly bills</h2><div class="card">${S.bills.map((b,i)=>`<div class="item"><div>${esc(b.name)}</div><div>${money2(b.amount)} <button class="x" data-bd="${i}">✕</button></div></div>`).join('')||'<div class="empty">No bills yet.</div>'}
-<div class="row" style="margin-top:10px"><input id="bn" placeholder="Rent"><input id="ba" type="number" inputmode="decimal" placeholder="$"><button class="sm" id="bad">Add</button></div></div>
-<h2>Savings goal</h2><div class="card"><label>What are you saving for?</label><input id="gn" value="${esc(g.name)}" placeholder="Trip, laptop, emergency fund">
-<label>Goal amount</label><input id="ga" type="number" inputmode="decimal" value="${g.amount||''}"><label>Starting savings (before using the app)</label><input id="gs" type="number" inputmode="decimal" value="${g.saved||''}"><label>Target date</label><input id="gd" type="date" value="${g.date}"></div>`},
-me(){const nOk='Notification' in window,np=nOk?Notification.permission:'unsupported';
-return`<h1>Account</h1><p class="sub">${sb?(user?'Signed in as '+esc(user.email):'Sign in to sync across devices.'):'Supabase isn’t configured yet. Your data is saved on this device.'}</p>
-${sb?(user?'<button class="g w" id="out">Sign out</button>':`<div class="card"><label>Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div style="height:12px"></div><div class="row"><button id="in">Sign in</button><button class="g" id="up">Sign up</button></div></div>`):''}
-<p class="msg">${esc(msg)}</p>
-<h2>Daily reminder</h2><div class="card"><div class="item" style="border:0;padding:0"><span>Notify me with my safe number</span><button class="${S.notif.on?'':'g'} sm" id="nt">${S.notif.on?'On':'Off'}</button></div>
-<label>Time</label><input id="nz" type="time" value="${S.notif.time}"><p class="msg">${nOk?'Permission: '+np+'. Reminders fire when the app is opened after your set time.':'Notifications aren’t supported in this browser. On iPhone, add to Home Screen first.'}</p></div>
-<h2>Install</h2><div class="card msg" style="margin:0">iPhone: Share → Add to Home Screen. Android: menu → Install app.</div>`}};
-const A=$('#app');
-A.addEventListener('click',async e=>{const t=e.target,id=t.id;
-if(t.dataset.go){tab=t.dataset.go;return render()}
-if(t.dataset.del){S.spends=S.spends.filter(s=>s.t!=t.dataset.del);save();return render()}
-if(t.dataset.bd){S.bills.splice(+t.dataset.bd,1);save();return render()}
-if(id==='qa'||id==='sadd'){const a=parseFloat($(id==='qa'?'#q':'#sa').value);if(!(a>0))return;S.spends.push({a,n:id==='sadd'?$('#sn').value.trim():'',d:iso(new Date()),t:Date.now()});save();render();if(calc().leftToday<0&&S.notif.on)notify('Over today’s limit','You’re over by '+money2(-calc().leftToday));return}
-if(id==='bad'){const n=$('#bn').value.trim(),a=parseFloat($('#ba').value);if(n&&a>0){S.bills.push({name:n,amount:a});save();render()}return}
-if(id==='nt'){if(!S.notif.on){if(!('Notification' in window))return;const p=await Notification.requestPermission();if(p!=='granted'){msg='Permission was blocked in your browser settings.';return render()}S.notif.on=true;save();notify('Notifications on','You’ll get your safe number each day.')}else{S.notif.on=false;save()}render()}
-if(id==='in'||id==='up'){const em=$('#em').value,pw=$('#pw').value;const r=id==='in'?await sb.auth.signInWithPassword({email:em,password:pw}):await sb.auth.signUp({email:em,password:pw});msg=r.error?r.error.message:(id==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
-if(id==='out'){await sb.auth.signOut();user=null;render()}});
-A.addEventListener('click',e=>{const t=e.target;if(t.dataset.q)addDep(+t.dataset.q);
-if(t.dataset.dd){S.deposits=S.deposits.filter(x=>x.t!=t.dataset.dd);save();render()}
-if(t.id==='dep'||t.id==='wd'){const a=parseFloat($('#da').value);if(a>0)addDep(t.id==='dep'?a:-a,$('#dn').value.trim())}});
-A.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;
-const m={inc:()=>S.income=+v||0,gn:()=>S.goal.name=v,ga:()=>S.goal.amount=+v||0,gs:()=>S.goal.saved=+v||0,gd:()=>S.goal.date=v,nz:()=>S.notif.time=v};if(m[i]){m[i]();save()}});
-async function notify(title,body){body=body||('You can spend '+money2(Math.max(0,calc().leftToday))+' today.');title=title||'SafeSpend';
-try{const r=await navigator.serviceWorker.getRegistration();r?r.showNotification(title,{body,icon:'icon.svg',badge:'icon.svg'}):new Notification(title,{body})}catch(e){}}
-function checkReminder(){if(!S.notif.on||!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n);if(S.notif.last===t)return;
-const[h,m]=S.notif.time.split(':');if(n.getHours()*60+n.getMinutes()>=+h*60+ +m){S.notif.last=t;save();notify()}}
-setInterval(checkReminder,6e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminder();if(tab==='today')render()}});
-async function onUser(u){user=u;const{data}=await sb.from('user_data').select('data').eq('user_id',u.id).maybeSingle();
-if(data&&data.data&&Object.keys(data.data).length){S=Object.assign(def(),data.data);localStorage.setItem(KEY,JSON.stringify(S))}else save()}
+function addTx(id,a){const g=S.goals.find(x=>x.id===id);if(!g)return;if(a<0)a=-Math.min(-a,g.saved);if(!a)return;const b=g.amount?g.saved/g.amount:0;g.saved+=a;S.tx.push({id,a,d:iso(new Date()),t:Date.now()});save();const f=g.amount?g.saved/g.amount:0;render();
+if(a>0){burst(24);const m=[.25,.5,.75,1].filter(x=>b<x&&f>=x).pop();if(m){burst(70);const t=m>=1?'🎉 Goal reached!':'🎉 '+m*100+'% there!';toast(t);if(S.notif.on)notify('Milestone!',t)}else toast('+'+M(a)+' saved')}else toast('Took out '+M(-a))}
+document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,v=t.dataset.v,id=V.split(':')[1];
+if(a==='go'){V=v;msg='';all=false;render()}
+else if(a==='next'){if(ob<3)ob++;else{S.name=($('#nm').value||'').trim();S.done=true;save();V='home'}render()}
+else if(a==='skip'){S.done=true;save();V='home';render()}
+else if(a==='eye'){S.hide=!S.hide;save();render()}
+else if(a==='all'){all=!all;render()}
+else if(a==='em'){em=v;$$('[data-a=em]').forEach(b=>b.classList.toggle('on',b===t))}
+else if(a==='amt'){pick=+v;$('#ca').value='';$$('[data-a=amt]').forEach(b=>b.classList.toggle('on',b===t))}
+else if(a==='top'||a==='out'){const c=parseFloat($('#ca').value),x=c>0?c:pick;addTx(id,a==='top'?x:-x)}
+else if(a==='mk'){const n=$('#gn').value.trim(),am=parseFloat($('#ga').value);if(!n||!(am>0))return toast('Add a name and target');const g={id:Date.now().toString(36),name:n,tag:$('#gt').value.trim(),amount:am,date:$('#gd').value,emoji:em,saved:0},st=parseFloat($('#gs').value);if(st>0){g.saved=st;S.tx.push({id:g.id,a:st,d:iso(new Date()),t:Date.now()})}S.goals.push(g);save();V='g:'+g.id;render();burst(40)}
+else if(a==='dg'){if(confirm('Delete this goal?')){S.goals=S.goals.filter(g=>g.id!==id);S.tx=S.tx.filter(x=>x.id!==id);save();V='home';render()}}
+else if(a==='sp'){const x=parseFloat($('#sq').value);if(x>0){S.spends.push({a:x,n:'',d:iso(new Date()),t:Date.now()});save();render();if(calc().lt<0&&S.notif.on)notify('Over today’s limit','Over by '+M(-calc().lt))}}
+else if(a==='ds'){S.spends=S.spends.filter(s=>s.t!=v);save();render()}
+else if(a==='ab'){const n=$('#bn').value.trim(),x=parseFloat($('#ba').value);if(n&&x>0){S.bills.push({name:n,amount:x});save();render()}}
+else if(a==='db'){S.bills.splice(+v,1);save();render()}
+else if(a==='nt'){if(!S.notif.on){if(!('Notification' in window))return;const p=await Notification.requestPermission();if(p!=='granted'){msg='Permission blocked in browser settings.';return render()}S.notif.on=true;save();notify('Notifications on','You’ll get your safe number each day.')}else{S.notif.on=false;save()}render()}
+else if(a==='in'||a==='up'){const em2=$('#em').value,pw=$('#pw').value,r=a==='in'?await sb.auth.signInWithPassword({email:em2,password:pw}):await sb.auth.signUp({email:em2,password:pw});msg=r.error?r.error.message:(a==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
+else if(a==='so'){await sb.auth.signOut();user=null;render()}});
+document.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;if(i==='inc')S.income=+v||0;else if(i==='nm2')S.name=v.trim();else if(i==='nz')S.notif.time=v;else return;save()});
+document.addEventListener('input',e=>{if(e.target.id==='ca')$$('[data-a=amt]').forEach(b=>b.classList.remove('on'))});
+async function notify(title,body){body=body||('You can spend '+M(Math.max(0,calc().lt))+' today.');title=title||'SafeSpend';try{const r=await navigator.serviceWorker.getRegistration();r?r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'}):new Notification(title,{body})}catch(e){}}
+function checkReminder(){if(!S.notif.on||!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n);if(S.notif.last===t)return;const[h,m]=S.notif.time.split(':');if(n.getHours()*60+n.getMinutes()>=+h*60+ +m){S.notif.last=t;save();notify()}}
+setInterval(checkReminder,6e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminder();if(V==='home')render()}});
+async function onUser(u){user=u;const{data}=await sb.from('user_data').select('data').eq('user_id',u.id).maybeSingle();if(data&&data.data&&Object.keys(data.data).length){S=Object.assign(def(),data.data);if(!S.done)S.done=true;localStorage.setItem(KEY,JSON.stringify(S));V='home'}else save()}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 (async()=>{if(sb){const{data}=await sb.auth.getSession();if(data.session)await onUser(data.session.user)}render();checkReminder()})();
 </script></body></html>
