@@ -39,6 +39,17 @@ nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(sa
 nav button{flex:1;background:none;color:var(--mu);box-shadow:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:9px 0;border-radius:24px}
 nav button.on{background:var(--dp);color:#fff}nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .msg{font-size:13px;color:var(--mu);margin-top:8px}.empty{text-align:center;color:var(--mu);padding:14px}
+.pig{text-align:center;background:linear-gradient(180deg,#f0fdf6,#fff);overflow:hidden}.pig .big{margin-top:4px;font-size:40px;color:var(--dp)}
+.bubble{display:inline-block;background:#fff;border:1.5px solid var(--ln);border-radius:18px;padding:7px 14px;font-weight:700;font-size:14px;color:var(--dp);box-shadow:var(--sh);animation:pop .6s both}
+.ms{display:flex;gap:6px;justify-content:center;margin-top:14px}.ms span{font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;background:var(--card2);color:#9db8ac;filter:grayscale(1)}.ms span.on{background:#d1fae5;color:var(--dp);filter:none;animation:pop .5s both}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.chips button{padding:12px 0}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;background:var(--dp);color:#fff;padding:11px 18px;border-radius:99px;font-weight:700;z-index:100;box-shadow:0 12px 30px -8px rgba(6,78,59,.5);animation:toast 2.4s both}
+.lvl{transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}.bob{animation:bob 3s ease-in-out infinite;transform-origin:120px 112px}.eye{transform-origin:160px 94px;animation:blink 4s infinite}.coin{animation:coin 3s infinite}
+@keyframes pop{from{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}to{transform:scale(1);opacity:1}}
+@keyframes toast{0%{opacity:0;transform:translate(-50%,-20px)}10%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-20px)}}
+@keyframes bob{50%{transform:translateY(-5px) rotate(-1deg)}}@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes coin{0%{transform:translateY(-6px);opacity:0}15%{opacity:1}60%{transform:translateY(36px);opacity:1}75%,100%{transform:translateY(44px) scale(.6);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body><main id="app"></main>
 <nav id="nav"></nav>
 <script src="config.js"></script>
@@ -49,24 +60,32 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const money=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n||0);
 const money2=n=>new Intl.NumberFormat(undefined,{style:'currency',currency:'USD'}).format(n||0);
 const iso=d=>d.toLocaleDateString('en-CA'),sum=a=>a.reduce((x,y)=>x+ +y.a,0);
-const def=()=>({income:0,bills:[],goal:{name:'',amount:0,saved:0,date:''},spends:[],notif:{on:false,time:'09:00',last:''}});
+const def=()=>({income:0,bills:[],goal:{name:'',amount:0,saved:0,date:''},spends:[],deposits:[],notif:{on:false,time:'09:00',last:''}});
+const sv=()=>(+S.goal.saved||0)+S.deposits.reduce((x,y)=>x+y.a,0);let shown=0;
 let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||'{}')),tab='today',sb=null,user=null,msg='',t0;
 if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
 function save(){localStorage.setItem(KEY,JSON.stringify(S));if(sb&&user){clearTimeout(t0);t0=setTimeout(()=>sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()}),600)}}
 function calc(){const now=new Date(),dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(),left=dim-now.getDate()+1;
 const bills=sum(S.bills.map(b=>({a:b.amount}))),g=S.goal;let ms=0;
-if(+g.amount>+g.saved&&g.date){const days=(new Date(g.date+'T23:59')-now)/864e5;ms=(g.amount-g.saved)/Math.max(1,Math.ceil(days/30.44))}
+if(+g.amount>sv()&&g.date){const days=(new Date(g.date+'T23:59')-now)/864e5;ms=(g.amount-sv())/Math.max(1,Math.ceil(days/30.44))}
 const disc=S.income-bills-ms,ym=iso(now).slice(0,7),td=iso(now);
 const spentM=sum(S.spends.filter(s=>s.d.startsWith(ym))),spentT=sum(S.spends.filter(s=>s.d===td));
 const safe=(disc-(spentM-spentT))/left;
 return{left,bills,ms,disc,spentM,spentT,safe,leftToday:safe-spentT,leftMonth:disc-spentM}}
-const ic={today:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',spend:'<path d="M12 5v14M5 12h14"/>',plan:'<path d="M4 6h16M4 12h16M4 18h10"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
-function nav(){$('#nav').innerHTML=[['today','Today'],['spend','Spend'],['plan','Plan'],['me','Account']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}"><svg viewBox="0 0 24 24">${ic[k]}</svg>${l}</button>`).join('')}
+const ic={today:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',spend:'<path d="M12 5v14M5 12h14"/>',plan:'<path d="M4 6h16M4 12h16M4 18h10"/>',save:'<path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9z"/>',me:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
+function nav(){$('#nav').innerHTML=[['today','Today'],['spend','Spend'],['save','Save'],['plan','Plan'],['me','Me']].map(([k,l])=>`<button class="${tab===k?'on':''}" data-t="${k}"><svg viewBox="0 0 24 24">${ic[k]}</svg>${l}</button>`).join('')}
 $('#nav').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;msg='';render()}};
-function render(){nav();$('#app').innerHTML=views[tab]();scrollTo(0,0)}
+function render(){nav();$('#app').innerHTML=views[tab]();scrollTo(0,0);if(tab==='save')pigIn()}
+const PIG=p=>`<svg viewBox="0 0 240 200" width="240" height="200" style="max-width:100%"><defs><clipPath id="pc"><ellipse cx="120" cy="112" rx="80" ry="62"/></clipPath><linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient></defs><g class="bob"><path d="M74 72L64 36l36 18z" fill="#6ee7b7" stroke="#10b981" stroke-width="4" stroke-linejoin="round"/><path d="M146 56l32-18-6 38z" fill="#6ee7b7" stroke="#10b981" stroke-width="4" stroke-linejoin="round"/><rect x="76" y="160" width="26" height="26" rx="10" fill="#34d399"/><rect x="138" y="160" width="26" height="26" rx="10" fill="#34d399"/><path d="M42 108c-18-6-14-26 0-20" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round"/><g class="coin"><circle cx="120" cy="22" r="12" fill="#fbbf24" stroke="#f59e0b" stroke-width="3"/><text x="120" y="27" text-anchor="middle" font-size="14" font-weight="800" fill="#b45309">$</text></g><ellipse cx="120" cy="112" rx="80" ry="62" fill="#d1fae5"/><g clip-path="url(#pc)"><rect class="lvl" x="30" y="50" width="180" height="130" fill="url(#pf)" opacity=".7" data-p="${p}" style="transform:translateY(124px)"/></g><ellipse cx="120" cy="112" rx="80" ry="62" fill="none" stroke="#10b981" stroke-width="4"/><rect x="105" y="52" width="30" height="6" rx="3" fill="#064e3b"/><ellipse cx="192" cy="116" rx="17" ry="14" fill="#6ee7b7" stroke="#10b981" stroke-width="3"/><circle cx="186" cy="116" r="3" fill="#064e3b"/><circle cx="198" cy="116" r="3" fill="#064e3b"/><circle cx="162" cy="116" r="8" fill="#fda4af" opacity=".7"/><circle class="eye" cx="160" cy="94" r="5.5" fill="#064e3b"/></g></svg>`;
+function pigIn(){requestAnimationFrame(()=>requestAnimationFrame(()=>{const l=$('.lvl');if(l)l.style.transform=`translateY(${(1-l.dataset.p)*124}px)`}));const el=$('#cnt'),to=sv(),from=shown,t=performance.now();shown=to;
+if(!el)return;(function f(n){const k=Math.min(1,(n-t)/1100),e=1-Math.pow(1-k,3);el.textContent=money2(from+(to-from)*e);if(k<1)requestAnimationFrame(f)})(t)}
+function burst(n){const cs=['#10b981','#34d399','#fbbf24','#a7f3d0','#fda4af','#fff'];for(let i=0;i<n;i++){const e=document.createElement('i'),z=6+Math.random()*8;Object.assign(e.style,{position:'fixed',left:'50%',top:'38%',width:z+'px',height:z+'px',borderRadius:i%2?'50%':'2px',background:cs[i%cs.length],zIndex:99,pointerEvents:'none'});document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*180;e.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+120}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove()}}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2500)}
+function addDep(a,n){const g=S.goal,b=g.amount>0?sv()/g.amount:0;S.deposits.push({a,n:n||'',d:iso(new Date()),t:Date.now()});save();const f=g.amount>0?sv()/g.amount:0;render();
+if(a>0){burst(22);const m=[.25,.5,.75,1].filter(x=>b<x&&f>=x).pop();if(m){burst(70);const t=m>=1?'🎉 Goal reached!':'🎉 '+m*100+'% of your goal!';toast(t);if(S.notif.on)notify('Milestone!',t)}else toast('+'+money2(a)+' saved 🐷')}else toast('Took out '+money2(-a))}
 const views={
 today(){const c=calc(),ready=S.income>0,pct=c.safe>0?Math.min(1,c.spentT/c.safe):1,R=92,L=2*Math.PI*R,over=c.leftToday<0;
-const g=S.goal,gp=g.amount>0?Math.min(100,g.saved/g.amount*100):0;
+const g=S.goal,gp=g.amount>0?Math.min(100,sv()/g.amount*100):0;
 return`<h1>${new Date().getHours()<12?'Good morning':new Date().getHours()<18?'Good afternoon':'Good evening'} 👋</h1><p class="sub">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</p>
 <div class="card hero"><div class="lbl">${over?'Over today’s limit by':'You can safely spend today'}</div>
 <div class="ring"><svg width="210" height="210"><defs><linearGradient id="rg"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="105" cy="105" r="${R}" stroke="rgba(255,255,255,.2)" stroke-width="14" fill="none"/><circle cx="105" cy="105" r="${R}" stroke="${over?'#fecdd3':'#fff'}" stroke-width="14" fill="none" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L*(1-pct)}"/></svg>
@@ -77,8 +96,17 @@ ${ready?'':'<button class="w wh" data-go="plan">Set up your plan</button>'}</div
 <div class="card"><span class="lbl">Days left</span><b>${c.left}</b></div>
 <div class="card"><span class="lbl">Bills / month</span><b>${money(c.bills)}</b></div>
 <div class="card"><span class="lbl">Saving / month</span><b class="ok">${money(c.ms)}</b></div></div>
-${g.amount>0?`<h2>Goal${g.name?': '+esc(g.name):''}</h2><div class="card"><div class="item" style="border:0;padding:0"><span>${money(g.saved)} of ${money(g.amount)}</span><b>${gp.toFixed(0)}%</b></div><div class="bar"><i style="width:${gp}%"></i></div></div>`:''}
+${g.amount>0?`<h2>Goal${g.name?': '+esc(g.name):''}</h2><div class="card"><div class="item" style="border:0;padding:0"><span>${money(sv())} of ${money(g.amount)}</span><b>${gp.toFixed(0)}%</b></div><div class="bar"><i style="width:${gp}%"></i></div></div>`:''}
 ${c.disc<0&&ready?'<div class="card bad">Your bills and goal exceed your income. Try a later goal date or a smaller goal.</div>':''}`},
+save(){const g=S.goal,t=sv(),p=g.amount>0?Math.min(1,Math.max(0,t/g.amount)):0,pc=Math.round(p*100),
+mood=!g.amount?'Set a goal in Plan so I know how big to get!':p===0?'Feed me some coins! 🪙':p<.25?'Yum! More please':p<.5?'Getting chubby 😋':p<.75?'Over halfway! 🎈':p<1?'Almost full!! 🤩':'I’m full! You did it 🎉',
+h=[...S.deposits].sort((a,b)=>b.t-a.t).slice(0,40);
+return`<h1>Piggy bank</h1><p class="sub">${g.name?'Saving for '+esc(g.name):'Every coin counts.'}</p>
+<div class="card pig"><div class="bubble">${mood}</div>${PIG(p)}<div class="big" id="cnt">${money2(shown)}</div><div class="lbl">${g.amount>0?pc+'% of '+money(g.amount)+' · '+money(Math.max(0,g.amount-t))+' to go':'saved so far'}</div><div class="bar"><i style="width:${pc}%"></i></div>
+<div class="ms">${[25,50,75,100].map(m=>`<span class="${pc>=m?'on':''}">${m===100?'🏆':'⭐'} ${m}%</span>`).join('')}</div></div>
+<div class="chips">${[5,10,25,50].map(v=>`<button class="g" data-q="${v}">+$${v}</button>`).join('')}</div>
+<div class="card"><label>Amount</label><input id="da" type="number" inputmode="decimal" placeholder="0.00"><label>Note (optional)</label><input id="dn" placeholder="Birthday money, paycheck…"><div style="height:12px"></div><div class="row"><button id="dep">Add to savings</button><button class="g" id="wd">Take out</button></div></div>
+<h2>History</h2><div class="card">${h.length?h.map(s=>`<div class="item"><div>${esc(s.n||(s.a>0?'Deposit':'Withdrawal'))}<small>${s.d}</small></div><div class="${s.a>0?'ok':'bad'}">${s.a>0?'+':'−'}${money2(Math.abs(s.a))} <button class="x" data-dd="${s.t}">✕</button></div></div>`).join(''):'<div class="empty">No savings logged yet. Drop in your first coin!</div>'}</div>`},
 spend(){const l=[...S.spends].sort((a,b)=>b.t-a.t).slice(0,60);
 return`<h1>Spending</h1><p class="sub">Log what you spend so your daily number stays honest.</p>
 <div class="card"><label>Amount</label><input id="sa" type="number" inputmode="decimal" placeholder="0.00"><label>Note (optional)</label><input id="sn" placeholder="Coffee, gas, lunch…"><div style="height:12px"></div><button class="w" id="sadd">Add purchase</button></div>
@@ -88,7 +116,7 @@ plan(){const g=S.goal;return`<h1>Your plan</h1><p class="sub">Manual inputs only
 <h2>Monthly bills</h2><div class="card">${S.bills.map((b,i)=>`<div class="item"><div>${esc(b.name)}</div><div>${money2(b.amount)} <button class="x" data-bd="${i}">✕</button></div></div>`).join('')||'<div class="empty">No bills yet.</div>'}
 <div class="row" style="margin-top:10px"><input id="bn" placeholder="Rent"><input id="ba" type="number" inputmode="decimal" placeholder="$"><button class="sm" id="bad">Add</button></div></div>
 <h2>Savings goal</h2><div class="card"><label>What are you saving for?</label><input id="gn" value="${esc(g.name)}" placeholder="Trip, laptop, emergency fund">
-<label>Goal amount</label><input id="ga" type="number" inputmode="decimal" value="${g.amount||''}"><label>Already saved</label><input id="gs" type="number" inputmode="decimal" value="${g.saved||''}"><label>Target date</label><input id="gd" type="date" value="${g.date}"></div>`},
+<label>Goal amount</label><input id="ga" type="number" inputmode="decimal" value="${g.amount||''}"><label>Starting savings (before using the app)</label><input id="gs" type="number" inputmode="decimal" value="${g.saved||''}"><label>Target date</label><input id="gd" type="date" value="${g.date}"></div>`},
 me(){const nOk='Notification' in window,np=nOk?Notification.permission:'unsupported';
 return`<h1>Account</h1><p class="sub">${sb?(user?'Signed in as '+esc(user.email):'Sign in to sync across devices.'):'Supabase isn’t configured yet. Your data is saved on this device.'}</p>
 ${sb?(user?'<button class="g w" id="out">Sign out</button>':`<div class="card"><label>Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div style="height:12px"></div><div class="row"><button id="in">Sign in</button><button class="g" id="up">Sign up</button></div></div>`):''}
@@ -106,6 +134,9 @@ if(id==='bad'){const n=$('#bn').value.trim(),a=parseFloat($('#ba').value);if(n&&
 if(id==='nt'){if(!S.notif.on){if(!('Notification' in window))return;const p=await Notification.requestPermission();if(p!=='granted'){msg='Permission was blocked in your browser settings.';return render()}S.notif.on=true;save();notify('Notifications on','You’ll get your safe number each day.')}else{S.notif.on=false;save()}render()}
 if(id==='in'||id==='up'){const em=$('#em').value,pw=$('#pw').value;const r=id==='in'?await sb.auth.signInWithPassword({email:em,password:pw}):await sb.auth.signUp({email:em,password:pw});msg=r.error?r.error.message:(id==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
 if(id==='out'){await sb.auth.signOut();user=null;render()}});
+A.addEventListener('click',e=>{const t=e.target;if(t.dataset.q)addDep(+t.dataset.q);
+if(t.dataset.dd){S.deposits=S.deposits.filter(x=>x.t!=t.dataset.dd);save();render()}
+if(t.id==='dep'||t.id==='wd'){const a=parseFloat($('#da').value);if(a>0)addDep(t.id==='dep'?a:-a,$('#dn').value.trim())}});
 A.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;
 const m={inc:()=>S.income=+v||0,gn:()=>S.goal.name=v,ga:()=>S.goal.amount=+v||0,gs:()=>S.goal.saved=+v||0,gd:()=>S.goal.date=v,nz:()=>S.notif.time=v};if(m[i]){m[i]();save()}});
 async function notify(title,body){body=body||('You can spend '+money2(Math.max(0,calc().leftToday))+' today.');title=title||'SafeSpend';
