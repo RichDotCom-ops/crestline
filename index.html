@@ -7,8 +7,8 @@
 <script>(function(){var t='dark';try{t=JSON.parse(localStorage.getItem('crestline.v1')||'{}').theme||'dark'}catch(e){}var l=t==='light',d=document;d.documentElement.dataset.theme=l?'light':'dark';d.querySelector('meta[name=theme-color]').content=l?'#f3f6f1':'#0f1110';d.querySelector('meta[name=apple-mobile-web-app-status-bar-style]').content=l?'default':'black-translucent'})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap">
 <style>
-:root{color-scheme:dark;--bg:#0f1110;--cd:#1a1d1b;--c2:#252927;--tx:#f4f6f2;--mu:#8d948e;--ac:#ccf35a;--at:#ccf35a;--ln:#2b302d;--bad:#ff7b7b;--okbg:rgba(204,243,90,.14);--sh:rgba(204,243,90,.3)}
-:root[data-theme=light]{color-scheme:light;--bg:#f3f6f1;--cd:#fff;--c2:#edf1ea;--tx:#101411;--mu:#66726a;--at:#3d6b0b;--ln:#e1e8de;--bad:#d64545;--okbg:rgba(77,124,15,.12);--sh:rgba(16,20,17,.4)}
+:root{color-scheme:dark;--bg:#0f1110;--cd:#1a1d1b;--c2:#252927;--tx:#f4f6f2;--mu:#8d948e;--ac:#ccf35a;--at:#ccf35a;--ln:#2b302d;--bad:#ff7b7b;--okbg:rgba(204,243,90,.14);--sh:rgba(204,243,90,.3);--up:#4ade80;--upbg:rgba(74,222,128,.14)}
+:root[data-theme=light]{color-scheme:light;--bg:#f3f6f1;--cd:#fff;--c2:#edf1ea;--tx:#101411;--mu:#66726a;--at:#3d6b0b;--ln:#e1e8de;--bad:#d64545;--okbg:rgba(77,124,15,.12);--sh:rgba(16,20,17,.4);--up:#15803d;--upbg:rgba(21,128,61,.1)}
 html,body{transition:background .3s,color .3s}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 Manrope,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
@@ -16,7 +16,7 @@ main{max-width:430px;margin:0 auto;min-height:100dvh;padding:calc(14px + env(saf
 main>*{animation:up .45s cubic-bezier(.2,.8,.2,1) both}main>*:nth-child(2){animation-delay:.05s}main>*:nth-child(3){animation-delay:.1s}main>*:nth-child(n+4){animation-delay:.15s}
 @keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 small{color:var(--mu);font-size:12.5px}h1{font-size:34px;line-height:1.1;letter-spacing:-.03em;margin:18px 0 10px;text-align:center}h1 span{color:var(--mu)}
-h2{font-size:18px;margin:0}.bad{color:var(--bad)}.ok{color:var(--at)}
+h2{font-size:18px;margin:0}.bad{color:var(--bad)}.ok{color:var(--up)}
 .top{display:flex;align-items:center;gap:12px;margin-bottom:18px}.gr{flex:1;display:flex;flex-direction:column}.gr b{font-size:17px}
 .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ccf35a,#6fd6a0);color:#0f1110;display:grid;place-items:center;font-weight:800;font-size:18px}
 button{font:inherit;border:0;cursor:pointer;transition:transform .15s}button:active{transform:scale(.96)}
@@ -35,7 +35,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0
 .chs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
 .chp{padding:10px 16px;border-radius:99px;background:var(--c2);color:var(--tx);font-weight:700;white-space:nowrap;border:1px solid var(--ln)}.chp.on{background:var(--ac);color:#0f1110;border-color:var(--ac)}
 .tr{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}.tr:last-child{border:0}.tr small{display:block}
-.l{display:flex;align-items:center;gap:12px}.dot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--okbg);color:var(--at)}.dot.w{background:rgba(255,123,123,.14);color:var(--bad)}
+.l{display:flex;align-items:center;gap:12px}.dot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--upbg);color:var(--up)}.dot.w{background:rgba(255,123,123,.14);color:var(--bad)}
 .empty{text-align:center;color:var(--mu);padding:14px;font-size:14px}.msg{font-size:13px;color:var(--mu);margin-top:8px}main>h2{margin:22px 2px 10px}
 .ot{display:flex;align-items:center;gap:14px}.ot small{width:30px}.ot a{color:var(--mu);cursor:pointer}.pl{flex:1;height:3px;background:var(--c2);border-radius:9px}.pl i{display:block;height:100%;background:var(--ac);border-radius:9px;transition:width .5s}
 .art{color:var(--tx);display:grid;place-items:center;margin:22px 0 6px}.cp{color:var(--mu);text-align:center;line-height:1.5;margin:0 12px}.fl{animation:bob 3s ease-in-out infinite}.fl:nth-child(even){animation-delay:-1.5s}@keyframes bob{50%{transform:translateY(-8px)}}
@@ -60,7 +60,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0
 .tg{display:flex;align-items:center;gap:14px}.tg[data-a]{cursor:pointer}.tgi{width:52px;height:52px;border-radius:16px;background:var(--okbg);display:grid;place-items:center;font-size:26px;flex:none}.tgv{font-size:24px;font-weight:800;letter-spacing:-.02em}
 .rg{transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
 .chh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}.cv{font-size:26px;font-weight:800;letter-spacing:-.03em}
-.tag.neg{background:rgba(255,123,123,.14);color:var(--bad)}
+.tag.up{background:var(--upbg);color:var(--up)}.tag.neg{background:rgba(255,123,123,.14);color:var(--bad)}
 @keyframes draw{to{stroke-dashoffset:0}}@keyframes fadein{from{opacity:0}}
 .dock .row>.pri{flex:1}.dock .row>.ghost{flex:0 0 auto;padding:17px 22px;font-size:16px;font-weight:800;border-radius:99px}
 .sc.hold .face{box-shadow:0 0 0 3px var(--at),0 30px 50px -24px var(--sh)}.tr[data-a]{cursor:pointer}
@@ -118,19 +118,21 @@ t[0]=m[0];t[n-1]=m[n-2];for(let i=1;i<n-1;i++)t[i]=m[i-1]*m[i]<=0?0:(m[i-1]+m[i]
 for(let i=0;i<n-1;i++){if(m[i]===0){t[i]=t[i+1]=0}else{const a=t[i]/m[i],b=t[i+1]/m[i],h=a*a+b*b;if(h>9){const k=3/Math.sqrt(h);t[i]=k*a*m[i];t[i+1]=k*b*m[i]}}}
 let d='M'+p[0][0]+' '+p[0][1];for(let i=0;i<n-1;i++){const x=dx[i]/3;d+=`C${(p[i][0]+x).toFixed(1)} ${(p[i][1]+t[i]*x).toFixed(1)} ${(p[i+1][0]-x).toFixed(1)} ${(p[i+1][1]-t[i+1]*x).toFixed(1)} ${p[i+1][0]} ${p[i+1][1]}`}return d}
 function growth(){const s=series();ch=s;const n=s.length,last=s[n-1].v,diff=last-s[0].v;
-const hdr=`<div class="chh"><div><small id="cdt">${RL[rg]}</small><div class="cv" id="cvv">${HM(last)}</div></div><span class="tag ${diff<0?'neg':''}">${diff<0?'▼':'▲'} ${HM(Math.abs(diff))}</span></div>`;
+const hdr=`<div class="chh"><div><small id="cdt">${RL[rg]}</small><div class="cv" id="cvv">${HM(last)}</div></div><span class="tag ${diff<0?'neg':'up'}">${diff<0?'▼':'▲'} ${HM(Math.abs(diff))}</span></div>`;
 const seg=`<div class="seg" style="margin:12px 0 0">${['1M','3M','1Y','All'].map(r=>`<button class="${rg===r?'on':''}" data-a="rg" data-v="${r}">${r}</button>`).join('')}</div>`;
 if(!S.tx.length)return`<div class="sh"><h2>Growth</h2></div><div class="card">${hdr}<div class="empty">Add savings to watch your balance grow.</div>${seg}</div>`;
 const W=320,H=150,L=6,Rr=6,T=12,B=22,vs=s.map(x=>x.v),mn=Math.min(...vs),mx=Math.max(...vs),pd=((mx-mn)||1)*.15,lo=mn-pd,hi=mx+pd,base=H-B;
-chp=s.map((p,i)=>[+(L+i*(W-L-Rr)/(n-1)).toFixed(1),+(T+(1-(p.v-lo)/(hi-lo))*(H-T-B)).toFixed(1)]);const d=mono(chp);
-return`<div class="sh"><h2>Growth</h2></div><div class="card">${hdr}<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;touch-action:pan-y"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--at);stop-opacity:.35"/><stop offset="1" style="stop-color:var(--at);stop-opacity:0"/></linearGradient></defs>
+chp=s.map((p,i)=>[+(L+i*(W-L-Rr)/(n-1)).toFixed(1),+(T+(1-(p.v-lo)/(hi-lo))*(H-T-B)).toFixed(1)]);const d=mono(chp),cl=s.map((p,i)=>i?(p.v>s[i-1].v?'var(--up)':p.v<s[i-1].v?'var(--bad)':null):null),fc=cl.find(x=>x)||'var(--up)';let cur=fc;const sc=cl.map(x=>cur=x||cur);let st='',a0=0,c0=sc[1];const o=i=>(i/(n-1)).toFixed(4);
+for(let i=2;i<n;i++){if(sc[i]!==c0){st+=`<stop offset="${a0}" style="stop-color:${c0}"/><stop offset="${o(i-1)}" style="stop-color:${c0}"/>`;a0=o(i-1);c0=sc[i]}}st+=`<stop offset="${a0}" style="stop-color:${c0}"/><stop offset="1" style="stop-color:${c0}"/>`;
+const ac=diff<0?'var(--bad)':'var(--up)';
+return`<div class="sh"><h2>Growth</h2></div><div class="card">${hdr}<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;touch-action:pan-y"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${ac};stop-opacity:.32"/><stop offset="1" style="stop-color:${ac};stop-opacity:0"/></linearGradient><linearGradient id="gs" gradientUnits="userSpaceOnUse" x1="${L}" x2="${W-Rr}" y1="0" y2="0">${st}</linearGradient></defs>
 ${[T,(T+base)/2,base].map(y=>`<line x1="${L}" x2="${W-Rr}" y1="${y}" y2="${y}" stroke="var(--ln)"/>`).join('')}
 <path d="${d}L${chp[n-1][0]} ${base}L${chp[0][0]} ${base}Z" fill="url(#ga)" style="animation:fadein 1s both .3s"/>
-<path d="${d}" fill="none" stroke="var(--at)" stroke-width="2.5" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.3s ease forwards"/>
+<path d="${d}" fill="none" stroke="url(#gs)" stroke-width="2.5" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.3s ease forwards"/>
 <text x="${L}" y="${H-6}" font-size="10" fill="var(--mu)">${sd(s[0].d)}</text><text x="${W-Rr}" y="${H-6}" font-size="10" text-anchor="end" fill="var(--mu)">${sd(s[n-1].d)}</text>
-<g id="cs" style="display:none"><line id="cl" y1="${T}" y2="${base}" stroke="var(--mu)" stroke-dasharray="3 3"/><circle id="cd" r="5" fill="var(--at)" stroke="var(--cd)" stroke-width="2.5"/></g><rect id="cr" width="${W}" height="${H}" fill="transparent"/></svg>${seg}</div>`}
+<g id="cs" style="display:none"><line id="cl" y1="${T}" y2="${base}" stroke="var(--mu)" stroke-dasharray="3 3"/><circle id="cd" r="5" style="fill:var(--up)" stroke="var(--cd)" stroke-width="2.5"/></g><rect id="cr" width="${W}" height="${H}" fill="transparent"/></svg>${seg}</div>`}
 function chartInit(){const r=$('#cr');if(!r||!ch)return;const n=ch.length,g=$('#cs'),vv=$('#cvv'),dt=$('#cdt'),v0=vv.textContent,d0=dt.textContent;
-const mv=e=>{const b=r.getBoundingClientRect(),i=Math.max(0,Math.min(n-1,Math.round(((e.clientX-b.left)/b.width*320-6)/(308/(n-1))))),[x,y]=chp[i];g.style.display='';$('#cl').setAttribute('x1',x);$('#cl').setAttribute('x2',x);$('#cd').setAttribute('cx',x);$('#cd').setAttribute('cy',y);vv.textContent=HM(ch[i].v);dt.textContent=fd(ch[i].d)},
+const mv=e=>{const b=r.getBoundingClientRect(),i=Math.max(0,Math.min(n-1,Math.round(((e.clientX-b.left)/b.width*320-6)/(308/(n-1))))),[x,y]=chp[i];g.style.display='';$('#cl').setAttribute('x1',x);$('#cl').setAttribute('x2',x);$('#cd').setAttribute('cx',x);$('#cd').setAttribute('cy',y);$('#cd').style.fill=i>0&&ch[i].v<ch[i-1].v?'var(--bad)':'var(--up)';vv.textContent=HM(ch[i].v);dt.textContent=fd(ch[i].d)},
 rs=()=>{g.style.display='none';vv.textContent=v0;dt.textContent=d0};['pointerdown','pointermove'].forEach(k=>r.addEventListener(k,mv));['pointerleave','pointerup','pointercancel'].forEach(k=>r.addEventListener(k,rs))}
 function tcard(){const t=total(),T=+S.target||0;
 if(!T)return`<div class="card tg" data-a="tgopen"><div class="tgi">🎯</div><div class="gb"><b>Set a savings target</b><br><small>Pick a number to aim for and track your progress</small></div><span class="dots">›</span></div>`;
