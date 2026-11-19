@@ -56,6 +56,12 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0
 .cg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}.cg .chp{padding:12px 0;text-align:center}
 .pf{position:relative}.pf span{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--mu);font-weight:700}.pf input{padding-left:30px;font-size:18px;font-weight:700}
 @keyframes fade{from{opacity:0}}@keyframes slide{from{transform:translate(-50%,100%)}}
+.gb{flex:1;min-width:0}.dots{color:var(--mu);font-size:22px}
+.tg{display:flex;align-items:center;gap:14px}.tg[data-a]{cursor:pointer}.tgi{width:52px;height:52px;border-radius:16px;background:var(--okbg);display:grid;place-items:center;font-size:26px;flex:none}.tgv{font-size:24px;font-weight:800;letter-spacing:-.02em}
+.rg{transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
+.chh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}.cv{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.tag.neg{background:rgba(255,123,123,.14);color:var(--bad)}
+@keyframes draw{to{stroke-dashoffset:0}}@keyframes fadein{from{opacity:0}}
 </style></head><body><main id="app"></main><div id="dock"></div><div id="sheet"></div>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
@@ -65,7 +71,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const M=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
 const iso=d=>d.toLocaleDateString('en-CA'),fd=d=>new Date(d+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 const sum=(a,f)=>a.reduce((x,y)=>x+ +f(y),0),MS=[100,250,500,1000,2500,5000,10000,25000,50000,100000];
-const def=()=>({name:'',done:false,tx:[],hide:false,notif:{on:false,time:'09:00',last:''},pay:{on:false,day:5,time:'09:00',last:''},theme:'dark'});
+const def=()=>({name:'',done:false,tx:[],hide:false,notif:{on:false,time:'09:00',last:''},pay:{on:false,day:5,time:'09:00',last:''},theme:'dark',target:0});
 let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('vaultly.v1')||localStorage.getItem('safespend.v2')||localStorage.getItem('safespend.v1')||'{}'));
 if(!S.tx.length){const d=(S.deposits||[]).map(x=>({a:+x.a,d:x.d,t:x.t})),s0=+(S.goal&&S.goal.saved)||0;if(s0)d.unshift({a:s0,d:iso(new Date()),t:1});S.tx=d.length?d:(S.goals||[]).filter(g=>g.saved>0).map(g=>({a:+g.saved,d:iso(new Date()),t:2}))}
 ['goals','goal','deposits','spends','bills','income'].forEach(k=>delete S[k]);if(S.tx.length)S.done=true;if(!S.pay)S.pay=def().pay;
@@ -100,33 +106,69 @@ const up=()=>{if(!cs.drag)return;cs.drag=0;if(cs.mv<6)cs.vy=(Math.random()>.5?1:
 (function tick(t){if(!document.body.contains(c))return;const dt=Math.min(32,t-last)/16;last=t;
 if(!cs.drag){if(Math.abs(cs.vy)>.5){cs.ry+=cs.vy*dt;cs.vy*=Math.pow(.95,dt)}else{cs.vy=0;const tg=Math.round(cs.ry/180)*180+Math.sin(t/1300)*6;cs.ry+=(tg-cs.ry)*.09*dt}cs.rx+=(Math.sin(t/900)*4-cs.rx)*.06*dt}
 c.style.transform=`rotateX(${cs.rx}deg) rotateY(${cs.ry}deg)`;const p=50+Math.sin(cs.ry*Math.PI/180)*70;gls.forEach(g=>g.style.backgroundPosition=p+'% 50%');cs.raf=requestAnimationFrame(tick)})(last)}
+let ch=null,chp=[],rg='3M';
+const RL={'1M':'Past month','3M':'Past 3 months','1Y':'Past year','All':'All time'},HM=v=>S.hide?'••••':M(v),sd=d=>new Date(d+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+function series(){const tx=[...S.tx].sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:a.t-b.t),td=new Date();td.setHours(12,0,0,0);
+const days={'1M':30,'3M':90,'1Y':365}[rg]||(tx.length?Math.max(7,Math.round((td-new Date(tx[0].d+'T12:00'))/864e5)):30);const out=[];let i=0,run=0;
+for(let k=days;k>=0;k--){const dt=new Date(td);dt.setDate(dt.getDate()-k);const ds=iso(dt);while(i<tx.length&&tx[i].d<=ds){run+=tx[i].a;i++}out.push({d:ds,v:run})}return out}
+function mono(p){const n=p.length,dx=[],m=[],t=[];for(let i=0;i<n-1;i++){dx[i]=p[i+1][0]-p[i][0];m[i]=(p[i+1][1]-p[i][1])/dx[i]}
+t[0]=m[0];t[n-1]=m[n-2];for(let i=1;i<n-1;i++)t[i]=m[i-1]*m[i]<=0?0:(m[i-1]+m[i])/2;
+for(let i=0;i<n-1;i++){if(m[i]===0){t[i]=t[i+1]=0}else{const a=t[i]/m[i],b=t[i+1]/m[i],h=a*a+b*b;if(h>9){const k=3/Math.sqrt(h);t[i]=k*a*m[i];t[i+1]=k*b*m[i]}}}
+let d='M'+p[0][0]+' '+p[0][1];for(let i=0;i<n-1;i++){const x=dx[i]/3;d+=`C${(p[i][0]+x).toFixed(1)} ${(p[i][1]+t[i]*x).toFixed(1)} ${(p[i+1][0]-x).toFixed(1)} ${(p[i+1][1]-t[i+1]*x).toFixed(1)} ${p[i+1][0]} ${p[i+1][1]}`}return d}
+function growth(){const s=series();ch=s;const n=s.length,last=s[n-1].v,diff=last-s[0].v;
+const hdr=`<div class="chh"><div><small id="cdt">${RL[rg]}</small><div class="cv" id="cvv">${HM(last)}</div></div><span class="tag ${diff<0?'neg':''}">${diff<0?'▼':'▲'} ${HM(Math.abs(diff))}</span></div>`;
+const seg=`<div class="seg" style="margin:12px 0 0">${['1M','3M','1Y','All'].map(r=>`<button class="${rg===r?'on':''}" data-a="rg" data-v="${r}">${r}</button>`).join('')}</div>`;
+if(!S.tx.length)return`<div class="sh"><h2>Growth</h2></div><div class="card">${hdr}<div class="empty">Add savings to watch your balance grow.</div>${seg}</div>`;
+const W=320,H=150,L=6,Rr=6,T=12,B=22,vs=s.map(x=>x.v),mn=Math.min(...vs),mx=Math.max(...vs),pd=((mx-mn)||1)*.15,lo=mn-pd,hi=mx+pd,base=H-B;
+chp=s.map((p,i)=>[+(L+i*(W-L-Rr)/(n-1)).toFixed(1),+(T+(1-(p.v-lo)/(hi-lo))*(H-T-B)).toFixed(1)]);const d=mono(chp);
+return`<div class="sh"><h2>Growth</h2></div><div class="card">${hdr}<svg viewBox="0 0 ${W} ${H}" style="display:block;width:100%;touch-action:pan-y"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--at);stop-opacity:.35"/><stop offset="1" style="stop-color:var(--at);stop-opacity:0"/></linearGradient></defs>
+${[T,(T+base)/2,base].map(y=>`<line x1="${L}" x2="${W-Rr}" y1="${y}" y2="${y}" stroke="var(--ln)"/>`).join('')}
+<path d="${d}L${chp[n-1][0]} ${base}L${chp[0][0]} ${base}Z" fill="url(#ga)" style="animation:fadein 1s both .3s"/>
+<path d="${d}" fill="none" stroke="var(--at)" stroke-width="2.5" stroke-linecap="round" pathLength="1" style="stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.3s ease forwards"/>
+<text x="${L}" y="${H-6}" font-size="10" fill="var(--mu)">${sd(s[0].d)}</text><text x="${W-Rr}" y="${H-6}" font-size="10" text-anchor="end" fill="var(--mu)">${sd(s[n-1].d)}</text>
+<g id="cs" style="display:none"><line id="cl" y1="${T}" y2="${base}" stroke="var(--mu)" stroke-dasharray="3 3"/><circle id="cd" r="5" fill="var(--at)" stroke="var(--cd)" stroke-width="2.5"/></g><rect id="cr" width="${W}" height="${H}" fill="transparent"/></svg>${seg}</div>`}
+function chartInit(){const r=$('#cr');if(!r||!ch)return;const n=ch.length,g=$('#cs'),vv=$('#cvv'),dt=$('#cdt'),v0=vv.textContent,d0=dt.textContent;
+const mv=e=>{const b=r.getBoundingClientRect(),i=Math.max(0,Math.min(n-1,Math.round(((e.clientX-b.left)/b.width*320-6)/(308/(n-1))))),[x,y]=chp[i];g.style.display='';$('#cl').setAttribute('x1',x);$('#cl').setAttribute('x2',x);$('#cd').setAttribute('cx',x);$('#cd').setAttribute('cy',y);vv.textContent=HM(ch[i].v);dt.textContent=fd(ch[i].d)},
+rs=()=>{g.style.display='none';vv.textContent=v0;dt.textContent=d0};['pointerdown','pointermove'].forEach(k=>r.addEventListener(k,mv));['pointerleave','pointerup','pointercancel'].forEach(k=>r.addEventListener(k,rs))}
+function tcard(){const t=total(),T=+S.target||0;
+if(!T)return`<div class="card tg" data-a="tgopen"><div class="tgi">🎯</div><div class="gb"><b>Set a savings target</b><br><small>Pick a number to aim for and track your progress</small></div><span class="dots">›</span></div>`;
+const p=Math.max(0,Math.min(1,t/T)),C=2*Math.PI*34;
+return`<div class="card tg"><svg width="86" height="86" viewBox="0 0 86 86" style="flex:none"><circle cx="43" cy="43" r="34" fill="none" stroke="var(--c2)" stroke-width="9"/><circle class="rg" cx="43" cy="43" r="34" fill="none" stroke="var(--at)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" data-o="${C*(1-p)}" transform="rotate(-90 43 43)"/><text x="43" y="48" text-anchor="middle" font-size="16" font-weight="800" fill="var(--tx)">${Math.round(p*100)}%</text></svg><div class="gb"><small>Savings target</small><div class="tgv">${HM(T)}</div><small>${t>=T?'🎉 Target reached!':HM(T-t)+' to go'}</small></div><button class="ghost" data-a="tgopen">Edit</button></div>`}
+function ringIn(){requestAnimationFrame(()=>requestAnimationFrame(()=>$$('.rg').forEach(c=>c.style.strokeDashoffset=c.dataset.o)))}
 const P={
 onb(){const o=OB[ob],last=ob===2;return[`<div class="ot"><small>${ob+1}/3</small><div class="pl"><i style="width:${(ob+1)*33.4}%"></i></div><a data-a="skip">Skip</a></div>${ob===0?'<div class="brand">'+MARK(36)+'<span>Crestline</span></div>':''}<div class="art">${ART}</div><h1>${o[0]}<br><span>${o[1]}</span></h1>${last?`<input id="nm" placeholder="Your name" value="${esc(S.name)}" autocomplete="given-name">`:`<p class="cp">${o[2]}</p>`}`,`<div class="dock"><button class="pri" data-a="next">${last?'Get started':'Continue'}</button></div>`]},
 home(){const t=total(),ym=iso(new Date()).slice(0,7),mo=sum(S.tx.filter(x=>x.d.startsWith(ym)&&x.a>0),x=>x.a),l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,5);
 return[`<div class="top"><div class="av">${esc((S.name||'U')[0].toUpperCase())}</div><div class="gr"><b>Hello, ${esc(S.name||'there')}</b><small>Your savings, simplified</small></div><button class="ib" data-a="th">${S.theme==='light'?I.moon:I.sun}</button><button class="ib" data-a="go" data-v="set">${I.set}</button></div>
 ${CARD(t,mo)}<div class="row" style="margin-bottom:14px"><span class="tag">▲ ${S.hide?'••••':M(mo)} this month</span><span class="hint">Drag or tap the card ✨</span><button class="ib" data-a="eye">${I.eye}</button></div>${S.pay.on&&new Date().getDay()===+S.pay.day?'<div class="card pay">💸 <b>It’s payday!</b> Pay yourself first and add something to savings today.</div>':''}
 
-<div class="sh"><h2>Recent activity</h2>${S.tx.length>5?'<a data-a="go" data-v="hist">View All ›</a>':''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">No savings yet. Add your first deposit below!</div>'}</div>`,`<div class="dock"><button class="pri" data-a="open">+ Add savings</button></div>`]},
+${tcard()}${growth()}<div class="sh"><h2>Recent activity</h2>${S.tx.length>5?'<a data-a="go" data-v="hist">View All ›</a>':''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">No savings yet. Add your first deposit below!</div>'}</div>`,`<div class="dock"><button class="pri" data-a="open">+ Add savings</button></div>`]},
 hist(){const l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,200);return[bk('Transaction history')+`<div class="card">${l.map(x=>txr(x,1)).join('')||'<div class="empty">No transactions yet.</div>'}</div>`]},
 set(){const nO='Notification' in window;return[bk('Settings')+`<h2>You</h2><div class="card" style="margin-top:10px"><label style="margin-top:0">Name</label><input id="nm2" value="${esc(S.name)}"></div>
 <h2>Appearance</h2><div class="card" style="margin-top:10px"><div class="seg" style="margin:0"><button class="${S.theme!=='light'?'on':''}" data-a="th" data-v="dark">Dark</button><button class="${S.theme==='light'?'on':''}" data-a="th" data-v="light">Light</button></div></div>
 <h2>Daily reminder</h2><div class="card" style="margin-top:10px"><div class="tr" style="border:0;padding-top:0"><span>Remind me to save</span><button class="${S.notif.on?'pri sm':'ghost'}" data-a="nt">${S.notif.on?'On':'Off'}</button></div><label>Time</label><input id="nz" type="time" value="${S.notif.time}"><p class="msg">${nO?'Reminders fire when the app is opened after your set time.':'Not supported here. On iPhone, add to Home Screen first.'}</p></div>
 <h2>Payday reminder</h2><div class="card" style="margin-top:10px"><div class="tr" style="border:0;padding-top:0"><span>Remind me to save on payday</span><button class="${S.pay.on?'pri sm':'ghost'}" data-a="pt">${S.pay.on?'On':'Off'}</button></div><label>Payday</label><select id="pd">${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((d,i)=>`<option value="${i}" ${i==S.pay.day?'selected':''}>Every ${d}</option>`).join('')}</select><label>Time</label><input id="pz" type="time" value="${S.pay.time}"><p class="msg">${esc(pmsg)||'You’ll get a notification and a banner on Home that day.'}</p></div>
 <h2>Account</h2><div class="card" style="margin-top:10px">${sb?(user?`<small>Signed in as ${esc(user.email)}</small><div style="height:10px"></div><button class="ghost" data-a="so">Sign out</button>`:`<label style="margin-top:0">Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div class="row" style="margin-top:12px"><button class="pri sm" data-a="in">Sign in</button><button class="ghost" data-a="up">Sign up</button></div>`):'<small>Accounts aren’t set up yet. Your data is saved on this device.</small>'}<p class="msg">${esc(msg)}</p></div>`]}};
-function render(){const h=P[V]();$('#app').innerHTML=h[0];$('#dock').innerHTML=h[1]||'';scrollTo(0,0);cancelAnimationFrame(cs.raf);if(V==='home')cardInit()}
+function render(){const h=P[V]();$('#app').innerHTML=h[0];$('#dock').innerHTML=h[1]||'';scrollTo(0,0);cancelAnimationFrame(cs.raf);if(V==='home'){cardInit();chartInit();ringIn()}}
 function burst(n){const cs=['#ccf35a','#f4f6f2','#6fd6a0','#fbbf24'];for(let i=0;i<n;i++){const e=document.createElement('i'),z=6+Math.random()*8;Object.assign(e.style,{position:'fixed',left:'50%',top:'30%',width:z+'px',height:z+'px',borderRadius:i%2?'50%':'2px',background:cs[i%4],zIndex:99,pointerEvents:'none'});document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*180;e.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+120}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove()}}
 function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2500)}
 function addTx(a){const t=total();if(a<0)a=-Math.min(-a,t);if(!a)return toast('Nothing to withdraw');S.tx.push({a,d:iso(new Date()),t:Date.now()});save();const f=t+a;render();
-if(a>0){burst(24);const m=MS.filter(x=>t<x&&f>=x).pop();if(m){burst(70);const s='🎉 You reached '+M(m)+'!';toast(s);if(S.notif.on)notify('Milestone!',s)}else toast('+'+M(a)+' saved')}else toast('Withdrew '+M(-a))}
+if(a>0){burst(24);const m=MS.filter(x=>t<x&&f>=x).pop(),tg=S.target>0&&t<S.target&&f>=S.target;if(tg){burst(90);const s='🎯 Target reached!';toast(s);if(S.notif.on)notify('Target reached!',s)}else if(m){burst(70);const s='🎉 You reached '+M(m)+'!';toast(s);if(S.notif.on)notify('Milestone!',s)}else toast('+'+M(a)+' saved')}else toast('Withdrew '+M(-a))}
 const amt=()=>{const i=$('#ca'),c=i?parseFloat(i.value):0;return c>0?c:pick},upd=()=>{const d=$('#sk');if(d)d.textContent=(mode==='add'?'Add ':'Withdraw ')+M(amt()).replace('.00','')};
-function sheet(){const cv=$('#ca')?$('#ca').value:'';$('#sheet').innerHTML=isOpen?`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><div class="seg"><button class="${mode==='add'?'on':''}" data-a="mode" data-v="add">Add savings</button><button class="${mode==='out'?'on':''}" data-a="mode" data-v="out">Withdraw</button></div><div class="cg">${[5,10,25,50,100].map(v=>`<button class="chp ${pick===v&&!cv?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="ca" type="number" inputmode="decimal" placeholder="Enter any amount" value="${cv}"></div><div style="height:14px"></div><button class="pri" id="sk" data-a="confirm"></button></div>`:'';upd()}
+const txSheet=cv=>`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><div class="seg"><button class="${mode==='add'?'on':''}" data-a="mode" data-v="add">Add savings</button><button class="${mode==='out'?'on':''}" data-a="mode" data-v="out">Withdraw</button></div><div class="cg">${[5,10,25,50,100].map(v=>`<button class="chp ${pick===v&&!cv?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="ca" type="number" inputmode="decimal" placeholder="Enter any amount" value="${cv}"></div><div style="height:14px"></div><button class="pri" id="sk" data-a="confirm"></button></div>`;
+const tgSheet=()=>`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><h2 style="margin-bottom:4px">Savings target</h2><small>How much do you want to save in total?</small><div class="cg" style="margin:14px 0 12px;grid-template-columns:repeat(4,1fr)">${[500,1000,5000,10000].map(v=>`<button class="chp ${+S.target===v?'on':''}" data-a="tgp" data-v="${v}">$${v>=1000?v/1000+'k':v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="tgi" type="number" inputmode="decimal" placeholder="Enter your target" value="${S.target||''}"></div><div style="height:14px"></div><button class="pri" data-a="tgsave">Save target</button>${S.target?'<button class="ghost" style="width:100%;margin-top:10px" data-a="tgclear">Remove target</button>':''}</div>`;
+function sheet(){const cv=$('#ca')?$('#ca').value:'';$('#sheet').innerHTML=isOpen==='tx'?txSheet(cv):isOpen==='tg'?tgSheet():'';upd()}
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,v=t.dataset.v;
 if(a==='go'){V=v;msg='';pmsg='';render()}
 else if(a==='next'){if(ob<2)ob++;else{S.name=($('#nm').value||'').trim();S.done=true;save();V='home'}render()}
 else if(a==='skip'){S.done=true;save();V='home';render()}
 else if(a==='eye'){S.hide=!S.hide;save();render()}
 else if(a==='amt'){pick=+v;$('#ca').value='';$$('[data-a=amt]').forEach(b=>b.classList.toggle('on',b===t));upd()}
-else if(a==='open'){isOpen=true;mode='add';sheet()}
+else if(a==='open'){isOpen='tx';mode='add';sheet()}
+else if(a==='tgopen'){isOpen='tg';sheet()}
+else if(a==='tgp'){$('#tgi').value=v;$$('[data-a=tgp]').forEach(b=>b.classList.toggle('on',b===t))}
+else if(a==='tgsave'){const x=parseFloat($('#tgi').value);if(!(x>0))return toast('Enter a target amount');S.target=x;save();isOpen=false;sheet();render();toast('Target set 🎯')}
+else if(a==='tgclear'){S.target=0;save();isOpen=false;sheet();render()}
+else if(a==='rg'){rg=v;const y=scrollY;render();scrollTo(0,y)}
 else if(a==='close'){isOpen=false;sheet()}
 else if(a==='mode'){mode=v;sheet()}
 else if(a==='confirm'){const x=amt();isOpen=false;sheet();addTx(mode==='add'?x:-x)}
@@ -137,7 +179,7 @@ else if(a==='pt'){if(!S.pay.on&&'Notification' in window&&Notification.permissio
 else if(a==='in'||a==='up'){const e2=$('#em').value,pw=$('#pw').value,r=a==='in'?await sb.auth.signInWithPassword({email:e2,password:pw}):await sb.auth.signUp({email:e2,password:pw});msg=r.error?r.error.message:(a==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
 else if(a==='so'){await sb.auth.signOut();user=null;render()}});
 document.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;if(i==='nm2')S.name=v.trim();else if(i==='pd')S.pay.day=+v;else if(i==='pz')S.pay.time=v;else if(i==='nz')S.notif.time=v;else return;save()});
-document.addEventListener('input',e=>{if(e.target.id==='ca'){$$('[data-a=amt]').forEach(b=>b.classList.remove('on'));upd()}});
+document.addEventListener('input',e=>{if(e.target.id==='tgi')$$('[data-a=tgp]').forEach(b=>b.classList.remove('on'));if(e.target.id==='ca'){$$('[data-a=amt]').forEach(b=>b.classList.remove('on'));upd()}});
 async function notify(title,body){body=body||('Time to save! Your balance is '+M(total())+'.');title=title||'Crestline';try{const r=await navigator.serviceWorker.getRegistration();r?r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'}):new Notification(title,{body})}catch(e){}}
 function checkReminder(){if(!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n),mins=n.getHours()*60+n.getMinutes(),at=x=>{const[h,m]=x.split(':');return mins>=+h*60+ +m};
 if(S.notif.on&&S.notif.last!==t&&at(S.notif.time)){S.notif.last=t;save();notify()}
