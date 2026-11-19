@@ -142,7 +142,7 @@ home(){const t=total(),ym=iso(new Date()).slice(0,7),mo=sum(S.tx.filter(x=>x.d.s
 return[`<div class="top"><div class="av">${esc((S.name||'U')[0].toUpperCase())}</div><div class="gr"><b>Hello, ${esc(S.name||'there')}</b><small>Your savings, simplified</small></div><button class="ib" data-a="th">${S.theme==='light'?I.moon:I.sun}</button><button class="ib" data-a="go" data-v="set">${I.set}</button></div>
 ${CARD(t,mo)}<div class="row" style="margin-bottom:14px"><span class="tag">▲ ${S.hide?'••••':M(mo)} this month</span><span class="hint">Drag or tap the card ✨</span><button class="ib" data-a="eye">${I.eye}</button></div>${S.pay.on&&new Date().getDay()===+S.pay.day?'<div class="card pay">💸 <b>It’s payday!</b> Pay yourself first and add something to savings today.</div>':''}
 
-${tcard()}${growth()}<div class="sh"><h2>Recent activity</h2>${S.tx.length>5?'<a data-a="go" data-v="hist">View All ›</a>':''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">No savings yet. Add your first deposit below!</div>'}</div>`,`<div class="dock"><div class="row"><button class="pri" data-a="open">+ Add savings</button><button class="ghost" data-a="openout">− Decrease</button></div></div>`]},
+${tcard()}${growth()}<div class="sh"><h2>Recent activity</h2>${S.tx.length>5?'<a data-a="go" data-v="hist">View All ›</a>':''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">No savings yet. Add your first deposit below!</div>'}</div>`,`<div class="dock"><button class="pri" data-a="open">+ Add savings</button></div>`]},
 hist(){const l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,200);return[bk('Transaction history')+`<div class="card">${l.map(x=>txr(x,1)).join('')||'<div class="empty">No transactions yet.</div>'}</div>`]},
 set(){const nO='Notification' in window;return[bk('Settings')+`<h2>You</h2><div class="card" style="margin-top:10px"><label style="margin-top:0">Name</label><input id="nm2" value="${esc(S.name)}"></div>
 <h2>Appearance</h2><div class="card" style="margin-top:10px"><div class="seg" style="margin:0"><button class="${S.theme!=='light'?'on':''}" data-a="th" data-v="dark">Dark</button><button class="${S.theme==='light'?'on':''}" data-a="th" data-v="light">Light</button></div></div>
@@ -155,7 +155,7 @@ function toast(t){const e=document.createElement('div');e.className='toast';e.te
 function addTx(a){const t=total();if(a<0)a=-Math.min(-a,t);if(!a)return toast('Nothing to withdraw');S.tx.push({a,d:iso(new Date()),t:Date.now()});save();const f=t+a;render();
 if(a>0){burst(24);const m=MS.filter(x=>t<x&&f>=x).pop(),tg=S.target>0&&t<S.target&&f>=S.target;if(tg){burst(90);const s='🎯 Target reached!';toast(s);if(S.notif.on)notify('Target reached!',s)}else if(m){burst(70);const s='🎉 You reached '+M(m)+'!';toast(s);if(S.notif.on)notify('Milestone!',s)}else toast('+'+M(a)+' saved')}else toast('Decreased by '+M(-a))}
 const amt=()=>{const i=$('#ca'),c=i?parseFloat(i.value):0;return c>0?c:pick},upd=()=>{const d=$('#sk');if(d)d.textContent=(mode==='add'?'Add ':'Decrease ')+M(amt()).replace('.00','')};
-const txSheet=cv=>`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><div class="seg"><button class="${mode==='add'?'on':''}" data-a="mode" data-v="add">Add savings</button><button class="${mode==='out'?'on':''}" data-a="mode" data-v="out">Decrease</button></div><div class="cg">${[5,10,25,50,100].map(v=>`<button class="chp ${pick===v&&!cv?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="ca" type="number" inputmode="decimal" placeholder="Enter any amount" value="${cv}"></div><div style="height:14px"></div><button class="pri" id="sk" data-a="confirm"></button></div>`;
+const txSheet=cv=>`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><h2 style="margin-bottom:14px">Add savings</h2><div class="cg">${[5,10,25,50,100].map(v=>`<button class="chp ${pick===v&&!cv?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="ca" type="number" inputmode="decimal" placeholder="Enter any amount" value="${cv}"></div><div style="height:14px"></div><button class="pri" id="sk" data-a="confirm"></button></div>`;
 const tgSheet=()=>`<div class="ov" data-a="close"></div><div class="sheet"><div class="hd"></div><h2 style="margin-bottom:4px">Savings target</h2><small>How much do you want to save in total?</small><div class="cg" style="margin:14px 0 12px;grid-template-columns:repeat(4,1fr)">${[500,1000,5000,10000].map(v=>`<button class="chp ${+S.target===v?'on':''}" data-a="tgp" data-v="${v}">$${v>=1000?v/1000+'k':v}</button>`).join('')}</div><div class="pf"><span>$</span><input id="tgi" type="number" inputmode="decimal" placeholder="Enter your target" value="${S.target||''}"></div><div style="height:14px"></div><button class="pri" data-a="tgsave">Save target</button>${S.target?'<button class="ghost" style="width:100%;margin-top:10px" data-a="tgclear">Remove target</button>':''}</div>`;
 function sheet(){const cv=$('#ca')?$('#ca').value:'';$('#sheet').innerHTML=isOpen==='tx'?txSheet(cv):isOpen==='tg'?tgSheet():'';upd()}
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,v=t.dataset.v;
@@ -164,7 +164,6 @@ else if(a==='next'){if(ob<2)ob++;else{S.name=($('#nm').value||'').trim();S.done=
 else if(a==='skip'){S.done=true;save();V='home';render()}
 else if(a==='eye'){S.hide=!S.hide;save();render()}
 else if(a==='amt'){pick=+v;$('#ca').value='';$$('[data-a=amt]').forEach(b=>b.classList.toggle('on',b===t));upd()}
-else if(a==='openout'){isOpen='tx';mode='out';sheet()}
 else if(a==='open'){isOpen='tx';mode='add';sheet()}
 else if(a==='tgopen'){isOpen='tg';sheet()}
 else if(a==='tgp'){$('#tgi').value=v;$$('[data-a=tgp]').forEach(b=>b.classList.toggle('on',b===t))}
@@ -172,7 +171,6 @@ else if(a==='tgsave'){const x=parseFloat($('#tgi').value);if(!(x>0))return toast
 else if(a==='tgclear'){S.target=0;save();isOpen=false;sheet();render()}
 else if(a==='rg'){rg=v;const y=scrollY;render();scrollTo(0,y)}
 else if(a==='close'){isOpen=false;sheet()}
-else if(a==='mode'){mode=v;sheet()}
 else if(a==='confirm'){const x=amt();isOpen=false;sheet();addTx(mode==='add'?x:-x)}
 else if(a==='th'){S.theme=v||(S.theme==='light'?'dark':'light');save();applyTheme();render()}
 else if(a==='dt'){S.tx=S.tx.filter(x=>x.t!=v);save();render()}
