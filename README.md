@@ -1,4 +1,4 @@
-# Vaultly
+# Crestline
 A clean savings app: add any amount, track your balance and history. Installable PWA with Supabase accounts.
 
 ## Setup
