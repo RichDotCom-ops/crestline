@@ -27,7 +27,7 @@ button{font:inherit;border:0;cursor:pointer;transition:transform .15s}button:act
 .hb .ib{position:absolute;top:16px;right:16px}.amt{font-size:46px;font-weight:800;letter-spacing:-.04em;margin:4px 0 12px}
 .tag{display:inline-block;background:rgba(204,243,90,.14);color:var(--ac);font-weight:700;font-size:13px;border-radius:99px;padding:6px 12px}
 .sh{display:flex;justify-content:space-between;align-items:center;margin:22px 2px 12px}.sh a{color:var(--mu);font-size:13px;cursor:pointer}
-input{width:100%;background:var(--c2);border:1.5px solid transparent;color:var(--tx);border-radius:16px;padding:14px 15px;font:inherit;outline:none}input:focus{border-color:var(--ac)}input::placeholder{color:#667068}
+input,select{width:100%;background:var(--c2);border:1.5px solid transparent;color:var(--tx);border-radius:16px;padding:14px 15px;font:inherit;outline:none}input:focus,select:focus{border-color:var(--ac)}input::placeholder{color:#667068}
 label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0 6px}.row{display:flex;gap:8px;align-items:center}.row>input{flex:1;min-width:0}
 .chs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
 .chp{padding:10px 16px;border-radius:99px;background:var(--c2);color:var(--tx);font-weight:700;white-space:nowrap;border:1px solid var(--ln)}.chp.on{background:var(--ac);color:#0f1110;border-color:var(--ac)}
@@ -44,6 +44,7 @@ label{display:block;font-size:13px;font-weight:700;color:var(--mu);margin:14px 0
 .face{position:absolute;inset:0;border-radius:22px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 30px 50px -24px rgba(204,243,90,.3),0 0 0 1px rgba(255,255,255,.06)}.face svg{display:block;width:100%;height:100%;pointer-events:none}.bk{transform:rotateY(180deg)}
 .gl{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);background-size:260% 100%;mix-blend-mode:overlay}
 .hint{color:var(--mu);font-size:12px;flex:1;text-align:center}
+.pay{background:rgba(204,243,90,.12);border-color:rgba(204,243,90,.3);font-size:14px}
 </style></head><body><main id="app"></main><div id="dock"></div>
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
@@ -53,11 +54,11 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const M=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0);
 const iso=d=>d.toLocaleDateString('en-CA'),fd=d=>new Date(d+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 const sum=(a,f)=>a.reduce((x,y)=>x+ +f(y),0),MS=[100,250,500,1000,2500,5000,10000,25000,50000,100000];
-const def=()=>({name:'',done:false,tx:[],hide:false,notif:{on:false,time:'09:00',last:''}});
+const def=()=>({name:'',done:false,tx:[],hide:false,notif:{on:false,time:'09:00',last:''},pay:{on:false,day:5,time:'09:00',last:''}});
 let S=Object.assign(def(),JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('safespend.v2')||localStorage.getItem('safespend.v1')||'{}'));
 if(!S.tx.length){const d=(S.deposits||[]).map(x=>({a:+x.a,d:x.d,t:x.t})),s0=+(S.goal&&S.goal.saved)||0;if(s0)d.unshift({a:s0,d:iso(new Date()),t:1});S.tx=d.length?d:(S.goals||[]).filter(g=>g.saved>0).map(g=>({a:+g.saved,d:iso(new Date()),t:2}))}
-['goals','goal','deposits','spends','bills','income'].forEach(k=>delete S[k]);if(S.tx.length)S.done=true;
-let V=S.done?'home':'onb',ob=0,pick=10,msg='',sb=null,user=null,t0;
+['goals','goal','deposits','spends','bills','income'].forEach(k=>delete S[k]);if(S.tx.length)S.done=true;if(!S.pay)S.pay=def().pay;
+let V=S.done?'home':'onb',ob=0,pick=10,msg='',pmsg='',sb=null,user=null,t0;
 if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
 function save(){localStorage.setItem(KEY,JSON.stringify(S));if(sb&&user){clearTimeout(t0);t0=setTimeout(()=>sb.from('user_data').upsert({user_id:user.id,data:S,updated_at:new Date().toISOString()}),600)}}
 const total=()=>sum(S.tx,x=>x.a);
@@ -88,12 +89,13 @@ const P={
 onb(){const o=OB[ob],last=ob===2;return[`<div class="ot"><small>${ob+1}/3</small><div class="pl"><i style="width:${(ob+1)*33.4}%"></i></div><a data-a="skip">Skip</a></div><div class="art">${ART}</div><h1>${o[0]}<br><span>${o[1]}</span></h1>${last?`<input id="nm" placeholder="Your name" value="${esc(S.name)}" autocomplete="given-name">`:`<p class="cp">${o[2]}</p>`}`,`<div class="dock"><button class="pri" data-a="next">${last?'Get started':'Continue'}</button></div>`]},
 home(){const t=total(),ym=iso(new Date()).slice(0,7),mo=sum(S.tx.filter(x=>x.d.startsWith(ym)&&x.a>0),x=>x.a),l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,5);
 return[`<div class="top"><div class="av">${esc((S.name||'U')[0].toUpperCase())}</div><div class="gr"><b>Hello, ${esc(S.name||'there')}</b><small>Your savings, simplified</small></div><button class="ib" data-a="go" data-v="set">${I.set}</button></div>
-${CARD(t,mo)}<div class="row" style="margin-bottom:14px"><span class="tag">▲ ${S.hide?'••••':M(mo)} this month</span><span class="hint">Drag or tap the card ✨</span><button class="ib" data-a="eye">${I.eye}</button></div>
+${CARD(t,mo)}<div class="row" style="margin-bottom:14px"><span class="tag">▲ ${S.hide?'••••':M(mo)} this month</span><span class="hint">Drag or tap the card ✨</span><button class="ib" data-a="eye">${I.eye}</button></div>${S.pay.on&&new Date().getDay()===+S.pay.day?'<div class="card pay">💸 <b>It’s payday!</b> Pay yourself first and add something to savings today.</div>':''}
 <div class="card"><h2 style="margin-bottom:12px">Add savings</h2><div class="chs">${[5,10,25,50,100].map(v=>`<button class="chp ${pick===v?'on':''}" data-a="amt" data-v="${v}">$${v}</button>`).join('')}</div><div class="row"><input id="ca" type="number" inputmode="decimal" placeholder="Or enter any amount"><button class="ghost" data-a="out">Withdraw</button></div></div>
 <div class="sh"><h2>Recent activity</h2>${S.tx.length>5?'<a data-a="go" data-v="hist">View All ›</a>':''}</div><div class="card">${l.map(x=>txr(x)).join('')||'<div class="empty">No savings yet. Add your first deposit below!</div>'}</div>`,`<div class="dock"><button class="pri" id="dk" data-a="add">Add ${M(pick).replace('.00','')} to savings</button></div>`]},
 hist(){const l=[...S.tx].sort((a,b)=>b.t-a.t).slice(0,200);return[bk('Transaction history')+`<div class="card">${l.map(x=>txr(x,1)).join('')||'<div class="empty">No transactions yet.</div>'}</div>`]},
 set(){const nO='Notification' in window;return[bk('Settings')+`<h2>You</h2><div class="card" style="margin-top:10px"><label style="margin-top:0">Name</label><input id="nm2" value="${esc(S.name)}"></div>
 <h2>Daily reminder</h2><div class="card" style="margin-top:10px"><div class="tr" style="border:0;padding-top:0"><span>Remind me to save</span><button class="${S.notif.on?'pri sm':'ghost'}" data-a="nt">${S.notif.on?'On':'Off'}</button></div><label>Time</label><input id="nz" type="time" value="${S.notif.time}"><p class="msg">${nO?'Reminders fire when the app is opened after your set time.':'Not supported here. On iPhone, add to Home Screen first.'}</p></div>
+<h2>Payday reminder</h2><div class="card" style="margin-top:10px"><div class="tr" style="border:0;padding-top:0"><span>Remind me to save on payday</span><button class="${S.pay.on?'pri sm':'ghost'}" data-a="pt">${S.pay.on?'On':'Off'}</button></div><label>Payday</label><select id="pd">${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].map((d,i)=>`<option value="${i}" ${i==S.pay.day?'selected':''}>Every ${d}</option>`).join('')}</select><label>Time</label><input id="pz" type="time" value="${S.pay.time}"><p class="msg">${esc(pmsg)||'You’ll get a notification and a banner on Home that day.'}</p></div>
 <h2>Account</h2><div class="card" style="margin-top:10px">${sb?(user?`<small>Signed in as ${esc(user.email)}</small><div style="height:10px"></div><button class="ghost" data-a="so">Sign out</button>`:`<label style="margin-top:0">Email</label><input id="em" type="email" autocomplete="email"><label>Password</label><input id="pw" type="password" autocomplete="current-password"><div class="row" style="margin-top:12px"><button class="pri sm" data-a="in">Sign in</button><button class="ghost" data-a="up">Sign up</button></div>`):'<small>Accounts aren’t set up yet. Your data is saved on this device.</small>'}<p class="msg">${esc(msg)}</p></div>`]}};
 function render(){const h=P[V]();$('#app').innerHTML=h[0];$('#dock').innerHTML=h[1]||'';scrollTo(0,0);cancelAnimationFrame(cs.raf);if(V==='home')cardInit()}
 function burst(n){const cs=['#ccf35a','#f4f6f2','#6fd6a0','#fbbf24'];for(let i=0;i<n;i++){const e=document.createElement('i'),z=6+Math.random()*8;Object.assign(e.style,{position:'fixed',left:'50%',top:'30%',width:z+'px',height:z+'px',borderRadius:i%2?'50%':'2px',background:cs[i%4],zIndex:99,pointerEvents:'none'});document.body.appendChild(e);const a=Math.random()*6.28,d=80+Math.random()*180;e.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d+120}px) rotate(${Math.random()*540}deg) scale(.4)`,opacity:0}],{duration:900+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>e.remove()}}
@@ -102,7 +104,7 @@ function addTx(a){const t=total();if(a<0)a=-Math.min(-a,t);if(!a)return toast('N
 if(a>0){burst(24);const m=MS.filter(x=>t<x&&f>=x).pop();if(m){burst(70);const s='🎉 You reached '+M(m)+'!';toast(s);if(S.notif.on)notify('Milestone!',s)}else toast('+'+M(a)+' saved')}else toast('Withdrew '+M(-a))}
 const amt=()=>{const c=parseFloat($('#ca').value);return c>0?c:pick},upd=()=>{const d=$('#dk');if(d)d.textContent='Add '+M(amt()).replace('.00','')+' to savings'};
 document.addEventListener('click',async e=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,v=t.dataset.v;
-if(a==='go'){V=v;msg='';render()}
+if(a==='go'){V=v;msg='';pmsg='';render()}
 else if(a==='next'){if(ob<2)ob++;else{S.name=($('#nm').value||'').trim();S.done=true;save();V='home'}render()}
 else if(a==='skip'){S.done=true;save();V='home';render()}
 else if(a==='eye'){S.hide=!S.hide;save();render()}
@@ -110,14 +112,17 @@ else if(a==='amt'){pick=+v;$('#ca').value='';$$('[data-a=amt]').forEach(b=>b.cla
 else if(a==='add')addTx(amt());else if(a==='out')addTx(-amt());
 else if(a==='dt'){S.tx=S.tx.filter(x=>x.t!=v);save();render()}
 else if(a==='nt'){if(!S.notif.on){if(!('Notification' in window))return;const p=await Notification.requestPermission();if(p!=='granted'){msg='Permission blocked in browser settings.';return render()}S.notif.on=true;save();notify('Reminders on','We’ll nudge you to save each day.')}else{S.notif.on=false;save()}render()}
+else if(a==='pt'){if(!S.pay.on&&'Notification' in window&&Notification.permission==='default')await Notification.requestPermission();S.pay.on=!S.pay.on;pmsg=S.pay.on&&'Notification' in window&&Notification.permission!=='granted'?'Notifications are off, so you’ll just see the banner on Home.':'';save();render()}
 else if(a==='in'||a==='up'){const e2=$('#em').value,pw=$('#pw').value,r=a==='in'?await sb.auth.signInWithPassword({email:e2,password:pw}):await sb.auth.signUp({email:e2,password:pw});msg=r.error?r.error.message:(a==='up'&&!r.data.session?'Check your email to confirm, then sign in.':'');if(!r.error&&r.data.session)await onUser(r.data.session.user);render()}
 else if(a==='so'){await sb.auth.signOut();user=null;render()}});
-document.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;if(i==='nm2')S.name=v.trim();else if(i==='nz')S.notif.time=v;else return;save()});
+document.addEventListener('change',e=>{const i=e.target.id,v=e.target.value;if(i==='nm2')S.name=v.trim();else if(i==='pd')S.pay.day=+v;else if(i==='pz')S.pay.time=v;else if(i==='nz')S.notif.time=v;else return;save()});
 document.addEventListener('input',e=>{if(e.target.id==='ca'){$$('[data-a=amt]').forEach(b=>b.classList.remove('on'));upd()}});
 async function notify(title,body){body=body||('Time to save! Your balance is '+M(total())+'.');title=title||'Vaultly';try{const r=await navigator.serviceWorker.getRegistration();r?r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'}):new Notification(title,{body})}catch(e){}}
-function checkReminder(){if(!S.notif.on||!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n);if(S.notif.last===t)return;const[h,m]=S.notif.time.split(':');if(n.getHours()*60+n.getMinutes()>=+h*60+ +m){S.notif.last=t;save();notify()}}
+function checkReminder(){if(!('Notification' in window)||Notification.permission!=='granted')return;const n=new Date(),t=iso(n),mins=n.getHours()*60+n.getMinutes(),at=x=>{const[h,m]=x.split(':');return mins>=+h*60+ +m};
+if(S.notif.on&&S.notif.last!==t&&at(S.notif.time)){S.notif.last=t;save();notify()}
+if(S.pay.on&&n.getDay()===+S.pay.day&&S.pay.last!==t&&at(S.pay.time)){S.pay.last=t;save();notify('Payday! 💸','Pay yourself first. Add something to your savings today.')}}
 setInterval(checkReminder,6e4);document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkReminder();if(V==='home')render()}});
-async function onUser(u){user=u;const{data}=await sb.from('user_data').select('data').eq('user_id',u.id).maybeSingle();if(data&&data.data&&Object.keys(data.data).length){S=Object.assign(def(),data.data);S.done=true;if(!Array.isArray(S.tx))S.tx=[];localStorage.setItem(KEY,JSON.stringify(S));V='home'}else save()}
+async function onUser(u){user=u;const{data}=await sb.from('user_data').select('data').eq('user_id',u.id).maybeSingle();if(data&&data.data&&Object.keys(data.data).length){S=Object.assign(def(),data.data);S.done=true;if(!S.pay)S.pay=def().pay;if(!Array.isArray(S.tx))S.tx=[];localStorage.setItem(KEY,JSON.stringify(S));V='home'}else save()}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 (async()=>{if(sb){const{data}=await sb.auth.getSession();if(data.session)await onUser(data.session.user)}render();checkReminder()})();
 </script></body></html>
